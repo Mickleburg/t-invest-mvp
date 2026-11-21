@@ -1,0 +1,83 @@
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "version": 2,
+  "status": "confirmed",
+  "educational": true,
+  "hypothesis": "EDUCATIONAL FIXTURE: supply disruption hypothesis, not a current event",
+  "missing": [],
+  "instrument": {
+    "id": "MOCK-FUTURE",
+    "ticker": "MOCK",
+    "class_code": "MOCK",
+    "kind": "future",
+    "spec_source_id": "fixture-spec"
+  },
+  "direction": "long",
+  "horizon": "hypothetical one day",
+  "entry_conditions": [
+    "User agreed hypothetical entry"
+  ],
+  "exit_conditions": [
+    "User agreed hypothetical stop"
+  ],
+  "review_conditions": [
+    "Review if assumed supply loss is not observed"
+  ],
+  "parameters": {
+    "entry": "100",
+    "stop": "99",
+    "quantity": "1",
+    "price_unit": "points",
+    "point_value": "10",
+    "point_value_currency": "RUB",
+    "lot_size": 1
+  },
+  "risk": {
+    "status": "calculated",
+    "limit": {
+      "kind": "money",
+      "value": "20",
+      "currency": "RUB"
+    },
+    "calculation": {
+      "loss_at_stop": "10",
+      "currency": "RUB",
+      "quantity": "1",
+      "spec_source_ids": [
+        "fixture-spec"
+      ]
+    },
+    "engine_version": "fixture-only",
+    "missing": []
+  },
+  "rules": [
+    {
+      "id": "fixture-price",
+      "metric": "price",
+      "operator": "lte",
+      "threshold": "99",
+      "unit": "points",
+      "automatic": true,
+      "max_age_seconds": 60,
+      "source_ids": [
+        "fixture-spec"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "fixture-spec",
+      "kind": "fixture",
+      "locator": "explicit synthetic fixture",
+      "retrieved_at": "2026-11-21T00:00:00Z",
+      "freshness": "available",
+      "synthetic": true
+    }
+  ],
+  "confirmation": {
+    "version": 2,
+    "content_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "confirmed_at": "2026-11-21T00:00:00Z",
+    "request_id": "00000000-0000-4000-8000-000000000002"
+  }
+}

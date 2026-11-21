@@ -1,0 +1,9 @@
+fastapi>=0.115,<1
+uvicorn>=0.34,<1
+pydantic>=2.10,<3
+mcp>=1.20,<2
+httpx>=0.28,<1
+pytest>=8.3,<10
+jsonschema>=4.20,<5
+pywin32>=311; sys_platform == "win32"
+playwright>=1.55,<2

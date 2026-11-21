@@ -1,0 +1,31 @@
+name: tradeguard
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-disabled}
+      TRADEGUARD_DATA: /data
+      TINVEST_SANDBOX_TOKEN: ${TINVEST_SANDBOX_TOKEN:-}
+      LLM_API_BASE: ${LLM_API_BASE:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+    volumes:
+      - mvp-data:/data
+    ports:
+      - "127.0.0.1:8003:8000"
+  frontend:
+    build:
+      context: ..
+      dockerfile: frontend/Dockerfile
+    environment:
+      API_UPSTREAM: http://backend:8000
+      HOST: 0.0.0.0
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:5173:5173"
+volumes:
+  mvp-data:

@@ -1,0 +1,16 @@
+backend/.venv/
+backend/runtime/
+**/__pycache__/
+**/.pytest_cache/
+**/node_modules/
+frontend/dist/
+infra/.env
+.env
+.env.*
+!.env.example
+*.dpapi
+*.sqlite*
+*.db
+*.log
+.coverage
+htmlcov/

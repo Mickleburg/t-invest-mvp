@@ -1,0 +1,19 @@
+{
+  "session": {
+    "id": "mock-session",
+    "title": "EDUCATIONAL MOCK",
+    "created_at": "2026-11-21T00:00:00Z",
+    "processing": 0
+  },
+  "messages": [
+    {
+      "id": 1,
+      "session_id": "mock-session",
+      "role": "assistant",
+      "text": "EDUCATIONAL MOCK: no live model or market data",
+      "created_at": "2026-11-21T00:00:00Z",
+      "response": null
+    }
+  ],
+  "evidence": []
+}

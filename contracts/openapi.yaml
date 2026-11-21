@@ -1,0 +1,1187 @@
+openapi: 3.1.0
+info:
+  title: TradeGuard MVP
+  version: 0.1.0
+  description: Implemented prototype subset + proposed CP2/CP3 operations. x-implementation-status
+    is normative; planned paths are not served.
+paths:
+  /api/health:
+    get:
+      summary: Health
+      operationId: health_api_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+      x-implementation-status: implemented
+  /api/sessions:
+    get:
+      summary: Sessions
+      operationId: sessions_api_sessions_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Session'
+                type: array
+                title: Response Sessions Api Sessions Get
+      x-implementation-status: implemented
+    post:
+      summary: Create
+      operationId: create_api_sessions_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionState'
+      x-implementation-status: implemented
+  /api/sessions/{sid}:
+    get:
+      summary: State
+      operationId: state_api_sessions__sid__get
+      parameters:
+      - name: sid
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Sid
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionState'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-implementation-status: implemented
+  /api/sessions/{sid}/messages:
+    post:
+      summary: Message
+      operationId: message_api_sessions__sid__messages_post
+      parameters:
+      - name: sid
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Sid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionState'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Conflict
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      x-implementation-status: implemented
+    get:
+      operationId: message_history
+      summary: message_history
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters:
+      - name: sid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageRecord'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/sessions/{sid}/plan:
+    get:
+      operationId: session_draft
+      summary: session_draft
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters:
+      - name: sid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradePlan'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/plans/{plan_id}:
+    get:
+      operationId: get_plan
+      summary: get_plan
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters: &id001
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradePlan'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      operationId: update_draft
+      summary: update_draft
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters: *id001
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradePlan'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanPatch'
+  /api/plans/{plan_id}/confirm:
+    post:
+      operationId: confirm_version
+      summary: confirm_version
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters: *id001
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradePlan'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanConfirmation'
+  /api/plans/{plan_id}/monitoring:
+    get:
+      operationId: monitoring_state
+      summary: monitoring_state
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters: *id001
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitoringState'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/plans/{plan_id}/notifications:
+    get:
+      operationId: notifications
+      summary: notifications
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters: *id001
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/plans/{plan_id}/checks:
+    get:
+      operationId: checks
+      summary: checks
+      description: PLANNED, not implemented. Calling this route today returns 404;
+        responses below are the target contract.
+      x-implementation-status: planned
+      parameters: *id001
+      responses:
+        '200':
+          description: Target success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Check'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Stale version/hash, already confirmed or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Incomplete/invalid plan or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Source/provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Error:
+      properties:
+        detail:
+          type: string
+          title: Detail
+      additionalProperties: false
+      type: object
+      required:
+      - detail
+      title: Error
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Health:
+      properties:
+        prompt_version:
+          type: string
+          title: Prompt Version
+        trading:
+          type: boolean
+          const: false
+          title: Trading
+        data_source:
+          type: string
+          title: Data Source
+        llm_provider:
+          type: string
+          title: Llm Provider
+          default: local_codex
+        llm_configured:
+          type: boolean
+          title: Llm Configured
+          default: true
+      additionalProperties: false
+      type: object
+      required:
+      - prompt_version
+      - trading
+      - data_source
+      title: Health
+    Message:
+      properties:
+        text:
+          type: string
+          maxLength: 5000
+          minLength: 1
+          title: Text
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+        educational:
+          type: boolean
+          title: Educational
+          default: false
+      additionalProperties: false
+      type: object
+      required:
+      - text
+      - request_id
+      title: Message
+    MessageRecord:
+      properties:
+        id:
+          type: integer
+          title: Id
+        session_id:
+          type: string
+          title: Session Id
+        role:
+          type: string
+          enum:
+          - user
+          - assistant
+          title: Role
+        text:
+          type: string
+          title: Text
+        created_at:
+          type: string
+          title: Created At
+        response:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Response
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - session_id
+      - role
+      - text
+      - created_at
+      - response
+      title: MessageRecord
+    Session:
+      properties:
+        id:
+          type: string
+          title: Id
+        title:
+          type: string
+          title: Title
+        created_at:
+          type: string
+          title: Created At
+        processing:
+          type: integer
+          enum:
+          - 0
+          - 1
+          title: Processing
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - title
+      - created_at
+      - processing
+      title: Session
+    SessionState:
+      properties:
+        session:
+          $ref: '#/components/schemas/Session'
+        messages:
+          items:
+            $ref: '#/components/schemas/MessageRecord'
+          type: array
+          title: Messages
+        evidence:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Evidence
+      additionalProperties: false
+      type: object
+      required:
+      - session
+      - messages
+      - evidence
+      title: SessionState
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    TradePlan:
+      title: TradeGuard versioned plan (not a brokerage order)
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+          minimum: 1
+        status:
+          enum:
+          - draft
+          - confirmed
+          - archived
+        educational: &id002
+          type: boolean
+        session_id: &id003
+          type: string
+        instrument: &id004
+          $ref: '#/components/schemas/Plan_Instrument'
+        direction: &id005
+          enum:
+          - long
+          - short
+        hypothesis: &id006
+          type: string
+        basis: &id007
+          type: array
+          items:
+            type: string
+        counterarguments: &id008
+          type: array
+          items:
+            type: string
+        horizon: &id009
+          type: string
+        entry_conditions: &id010
+          type: array
+          items:
+            type: string
+        exit_conditions: &id011
+          type: array
+          items:
+            type: string
+        review_conditions: &id012
+          type: array
+          items:
+            type: string
+        parameters: &id013
+          $ref: '#/components/schemas/Plan_Parameters'
+        risk: &id014
+          $ref: '#/components/schemas/Plan_Risk'
+        rules: &id015
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan_Rule'
+        sources: &id016
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan_Source'
+        missing: &id017
+          type: array
+          items:
+            type: string
+        confirmation:
+          $ref: '#/components/schemas/Plan_Confirmation'
+      required:
+      - id
+      - version
+      - status
+      - educational
+      allOf:
+      - if:
+          properties:
+            status:
+              const: confirmed
+        then:
+          required:
+          - instrument
+          - direction
+          - hypothesis
+          - horizon
+          - entry_conditions
+          - exit_conditions
+          - review_conditions
+          - parameters
+          - risk
+          - rules
+          - sources
+          - confirmation
+          properties:
+            hypothesis:
+              minLength: 1
+            entry_conditions:
+              minItems: 1
+            exit_conditions:
+              minItems: 1
+            review_conditions:
+              minItems: 1
+            sources:
+              minItems: 1
+            rules:
+              minItems: 1
+            missing:
+              maxItems: 0
+            parameters:
+              required:
+              - entry
+              - stop
+              - quantity
+              - price_unit
+            risk:
+              required:
+              - limit
+              - calculation
+              - engine_version
+              properties:
+                status:
+                  const: calculated
+                missing:
+                  maxItems: 0
+      - if:
+          properties:
+            status:
+              const: confirmed
+            instrument:
+              properties:
+                kind:
+                  const: future
+              required:
+              - kind
+          required:
+          - instrument
+        then:
+          properties:
+            instrument:
+              required:
+              - spec_source_id
+            parameters:
+              required:
+              - point_value
+              - point_value_currency
+              - lot_size
+      - if:
+          properties:
+            status:
+              const: confirmed
+            educational:
+              const: false
+        then:
+          properties:
+            sources:
+              items:
+                properties:
+                  synthetic:
+                    const: false
+                  freshness:
+                    const: available
+    Plan_Instrument:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        ticker:
+          type: string
+        class_code:
+          type: string
+        kind:
+          enum:
+          - share
+          - future
+        name:
+          type: string
+        spec_source_id:
+          type: string
+      required:
+      - id
+      - ticker
+      - class_code
+      - kind
+    Plan_Source:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        kind:
+          enum:
+          - mcp
+          - issuer
+          - news
+          - user
+          - fixture
+        locator:
+          type: string
+        retrieved_at:
+          type: string
+          format: date-time
+        observed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        freshness:
+          enum:
+          - available
+          - stale
+          - unknown
+        synthetic:
+          type: boolean
+      required:
+      - id
+      - kind
+      - locator
+      - retrieved_at
+      - freshness
+      - synthetic
+    Plan_Rule:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        metric:
+          enum:
+          - price
+          - manual_event
+        operator:
+          enum:
+          - lt
+          - lte
+          - gt
+          - gte
+          - manual
+        threshold:
+          type: string
+          pattern: ^-?(0|[1-9][0-9]*)(\.[0-9]+)?$
+        unit:
+          type: string
+        automatic:
+          type: boolean
+        source_ids:
+          type: array
+          items:
+            type: string
+        max_age_seconds:
+          type: integer
+          minimum: 1
+      required:
+      - id
+      - metric
+      - operator
+      - automatic
+      - source_ids
+      allOf:
+      - if:
+          properties:
+            automatic:
+              const: true
+        then:
+          required:
+          - threshold
+          - unit
+          - max_age_seconds
+          properties:
+            metric:
+              const: price
+            operator:
+              enum:
+              - lt
+              - lte
+              - gt
+              - gte
+    Plan_Parameters:
+      type: object
+      additionalProperties: false
+      properties:
+        entry:
+          type: string
+          pattern: ^-?(0|[1-9][0-9]*)(\.[0-9]+)?$
+        stop:
+          type: string
+          pattern: ^-?(0|[1-9][0-9]*)(\.[0-9]+)?$
+        target:
+          type: string
+          pattern: ^-?(0|[1-9][0-9]*)(\.[0-9]+)?$
+        quantity:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+        lot_size:
+          type: integer
+          minimum: 1
+        price_unit:
+          type: string
+        point_value:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+        point_value_currency:
+          type: string
+        capital:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+        capital_currency:
+          type: string
+        costs_per_unit:
+          type: string
+          pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+    Plan_Risk:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          enum:
+          - not_calculated
+          - calculated
+          - insufficient_data
+          - invalid
+        limit:
+          type: object
+          additionalProperties: false
+          properties:
+            kind:
+              enum:
+              - money
+              - percent
+            value:
+              type: string
+              pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+            currency:
+              type: string
+          required:
+          - kind
+          - value
+        calculation:
+          type: object
+          additionalProperties: false
+          properties:
+            loss_at_stop:
+              type: string
+              pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+            risk_percent:
+              type: string
+              pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+            reward_risk:
+              type: string
+              pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+            currency:
+              type: string
+            quantity:
+              type: string
+              pattern: ^(0|[1-9][0-9]*)(\.[0-9]+)?$
+            spec_source_ids:
+              type: array
+              items:
+                type: string
+          required:
+          - loss_at_stop
+          - currency
+          - quantity
+        assumptions:
+          type: array
+          items:
+            type: string
+        missing:
+          type: array
+          items:
+            type: string
+        engine_version:
+          type: string
+      required:
+      - status
+    Plan_Confirmation:
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        content_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        confirmed_at:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+          format: uuid
+      required:
+      - version
+      - content_hash
+      - confirmed_at
+      - request_id
+    PlanChanges:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        educational: *id002
+        session_id: *id003
+        instrument: *id004
+        direction: *id005
+        hypothesis: *id006
+        basis: *id007
+        counterarguments: *id008
+        horizon: *id009
+        entry_conditions: *id010
+        exit_conditions: *id011
+        review_conditions: *id012
+        parameters: *id013
+        risk: *id014
+        rules: *id015
+        sources: *id016
+        missing: *id017
+    PlanPatch:
+      type: object
+      additionalProperties: false
+      required:
+      - expected_version
+      - changes
+      properties:
+        expected_version:
+          type: integer
+          minimum: 1
+        changes:
+          $ref: '#/components/schemas/PlanChanges'
+    PlanConfirmation:
+      type: object
+      additionalProperties: false
+      required:
+      - version
+      - content_hash
+      - request_id
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        content_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        request_id:
+          type: string
+          format: uuid
+    MonitoringState:
+      type: object
+      additionalProperties: false
+      required:
+      - plan_id
+      - confirmed_version
+      - state
+      - last_checked_at
+      - next_check_at
+      properties:
+        plan_id:
+          type: string
+          format: uuid
+        confirmed_version:
+          type: integer
+          minimum: 1
+        state:
+          enum:
+          - not_started
+          - active
+          - paused
+          - error
+        last_checked_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        next_check_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    Check:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - plan_id
+      - plan_version
+      - rule_id
+      - checked_at
+      - status
+      - source_ids
+      - observed_value
+      properties:
+        id:
+          type: string
+        plan_id:
+          type: string
+        plan_version:
+          type: integer
+        rule_id:
+          type: string
+        checked_at:
+          type: string
+          format: date-time
+        status:
+          enum:
+          - satisfied
+          - affected
+          - insufficient_data
+          - error
+        source_ids:
+          type: array
+          items:
+            type: string
+        observed_value:
+          type:
+          - string
+          - 'null'
+    Notification:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - plan_id
+      - plan_version
+      - check_id
+      - created_at
+      - text
+      - delivery_status
+      properties:
+        id:
+          type: string
+        plan_id:
+          type: string
+        plan_version:
+          type: integer
+        check_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        text:
+          type: string
+        delivery_status:
+          enum:
+          - stored
+          - delivered
+          - failed
+x-contract-state: provisional-team-review-required

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TradeGuard · разбор торговой идеи</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="/"
+        >Trade<span>Guard</span><small>Исследовательский прототип</small></a
+      ><button id="newChat">Новая идея</button>
+    </header>
+    <main>
+      <section class="conversation">
+        <div class="intro">
+          <span class="eyebrow">ПОДУМАТЬ ДО СДЕЛКИ</span>
+          <h1>Что вы хотите отторговать?</h1>
+          <p>Обсудим основания, возможные возражения и риск.</p>
+          <details>
+            <summary>История диалогов</summary>
+            <select id="sessions" aria-label="Сохранённые диалоги"></select>
+          </details>
+        </div>
+        <div id="messages" aria-live="polite"></div>
+        <div id="suggestions">
+          <button>
+            Хочу купить акции Сбера перед отчётностью. Думаю, прибыль будет выше
+            ожиданий и акции вырастут.</button
+          ><button>
+            Хочу купить фьючерс на нефть, потому что думаю, что конфликт на
+            Ближнем Востоке обострится.</button
+          ><button>
+            Уже несколько раз потерял деньги. Хочу открыть большую позицию с
+            плечом, чтобы быстро отыграться.
+          </button>
+        </div>
+        <p id="busy" hidden role="status">
+          Агент разбирает идею и при необходимости проверяет источники. Это
+          может занять несколько минут.
+        </p>
+        <div id="error" hidden role="alert"></div>
+        <form id="composer">
+          <textarea
+            id="input"
+            rows="3"
+            maxlength="5000"
+            placeholder="Расскажите об идее и о том, почему она кажется вам убедительной…"
+            aria-label="Сообщение агенту"
+          ></textarea>
+          <div class="composer-bottom">
+            <label
+              ><input id="educational" type="checkbox" /> Учебная
+              ситуация</label
+            ><button id="send" type="submit">Обсудить</button>
+          </div>
+        </form>
+        <p class="footnote">
+          Без заявок и доступа к счетам. Решение остаётся за вами. Песочница MCP
+          может отвечать с задержкой.
+        </p>
+      </section>
+      <aside>
+        <section id="plan">
+          <p class="eyebrow">РАБОЧАЯ ГИПОТЕЗА</p>
+          <p class="muted">Промежуточные выводы появятся по мере разговора.</p>
+        </section>
+        <section id="risk" hidden></section>
+        <details id="sourcesPanel">
+          <summary>
+          Источники и попытки проверки
+            <span id="sourceCount">0</span>
+          </summary>
+          <div id="sources"></div>
+        </details>
+      </aside>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,580 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tradeguard.invalid/contracts/trade-plan-0.1.json",
+  "title": "TradeGuard versioned plan (not a brokerage order)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "confirmed",
+        "archived"
+      ]
+    },
+    "educational": {
+      "type": "boolean"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "instrument": {
+      "$ref": "#/$defs/Instrument"
+    },
+    "direction": {
+      "enum": [
+        "long",
+        "short"
+      ]
+    },
+    "hypothesis": {
+      "type": "string"
+    },
+    "basis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "counterarguments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "horizon": {
+      "type": "string"
+    },
+    "entry_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exit_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "parameters": {
+      "$ref": "#/$defs/Parameters"
+    },
+    "risk": {
+      "$ref": "#/$defs/Risk"
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Rule"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Source"
+      }
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confirmation": {
+      "$ref": "#/$defs/Confirmation"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "status",
+    "educational"
+  ],
+  "$defs": {
+    "Instrument": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "ticker": {
+          "type": "string"
+        },
+        "class_code": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "share",
+            "future"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "spec_source_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "ticker",
+        "class_code",
+        "kind"
+      ]
+    },
+    "Source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "mcp",
+            "issuer",
+            "news",
+            "user",
+            "fixture"
+          ]
+        },
+        "locator": {
+          "type": "string"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "freshness": {
+          "enum": [
+            "available",
+            "stale",
+            "unknown"
+          ]
+        },
+        "synthetic": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "locator",
+        "retrieved_at",
+        "freshness",
+        "synthetic"
+      ]
+    },
+    "Rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "metric": {
+          "enum": [
+            "price",
+            "manual_event"
+          ]
+        },
+        "operator": {
+          "enum": [
+            "lt",
+            "lte",
+            "gt",
+            "gte",
+            "manual"
+          ]
+        },
+        "threshold": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "automatic": {
+          "type": "boolean"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "max_age_seconds": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "metric",
+        "operator",
+        "automatic",
+        "source_ids"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "automatic": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "threshold",
+              "unit",
+              "max_age_seconds"
+            ],
+            "properties": {
+              "metric": {
+                "const": "price"
+              },
+              "operator": {
+                "enum": [
+                  "lt",
+                  "lte",
+                  "gt",
+                  "gte"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "stop": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "quantity": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "lot_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "price_unit": {
+          "type": "string"
+        },
+        "point_value": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "point_value_currency": {
+          "type": "string"
+        },
+        "capital": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "capital_currency": {
+          "type": "string"
+        },
+        "costs_per_unit": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        }
+      }
+    },
+    "Risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "not_calculated",
+            "calculated",
+            "insufficient_data",
+            "invalid"
+          ]
+        },
+        "limit": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "money",
+                "percent"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "currency": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        "calculation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "loss_at_stop": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "risk_percent": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "reward_risk": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "quantity": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "spec_source_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "loss_at_stop",
+            "currency",
+            "quantity"
+          ]
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "engine_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ]
+    },
+    "Confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "confirmed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "request_id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "version",
+        "content_hash",
+        "confirmed_at",
+        "request_id"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "confirmed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "instrument",
+          "direction",
+          "hypothesis",
+          "horizon",
+          "entry_conditions",
+          "exit_conditions",
+          "review_conditions",
+          "parameters",
+          "risk",
+          "rules",
+          "sources",
+          "confirmation"
+        ],
+        "properties": {
+          "hypothesis": {
+            "minLength": 1
+          },
+          "entry_conditions": {
+            "minItems": 1
+          },
+          "exit_conditions": {
+            "minItems": 1
+          },
+          "review_conditions": {
+            "minItems": 1
+          },
+          "sources": {
+            "minItems": 1
+          },
+          "rules": {
+            "minItems": 1
+          },
+          "missing": {
+            "maxItems": 0
+          },
+          "parameters": {
+            "required": [
+              "entry",
+              "stop",
+              "quantity",
+              "price_unit"
+            ]
+          },
+          "risk": {
+            "required": [
+              "limit",
+              "calculation",
+              "engine_version"
+            ],
+            "properties": {
+              "status": {
+                "const": "calculated"
+              },
+              "missing": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "confirmed"
+          },
+          "instrument": {
+            "properties": {
+              "kind": {
+                "const": "future"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          }
+        },
+        "required": [
+          "instrument"
+        ]
+      },
+      "then": {
+        "properties": {
+          "instrument": {
+            "required": [
+              "spec_source_id"
+            ]
+          },
+          "parameters": {
+            "required": [
+              "point_value",
+              "point_value_currency",
+              "lot_size"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "confirmed"
+          },
+          "educational": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sources": {
+            "items": {
+              "properties": {
+                "synthetic": {
+                  "const": false
+                },
+                "freshness": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
