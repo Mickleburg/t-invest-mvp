@@ -1,0 +1,6 @@
+{$TRADEGUARD_DOMAIN} {
+    basic_auth {
+        {$AUTH_USER} {$AUTH_PASSWORD_HASH}
+    }
+    reverse_proxy frontend:5173
+}

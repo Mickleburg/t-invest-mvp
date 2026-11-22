@@ -13,6 +13,8 @@ interfaces.py, contracts/, backend/requirements*, общие docs/AGENTS — и�
 
 ## Git-workflow
 
-Пока нет Git/HEAD; контрольный коммит делает пользователь. Затем четыре отдельные ветки/worktree: work/frontend, work/agent, work/backend, work/integration. Собственное окружение в каждом checkout, без копирования БД/секретов.
+Git уже существует (HEAD 5cf2510 на старте аудита). По новому поручению пользователя агент делает содержательные коммиты после значимых проверенных изменений с author/committer пользователя, без соавторства агента; push требует отдельного поручения. Четыре отдельные ветки/worktree: work/frontend, work/agent, work/backend, work/integration. Собственное окружение в каждом checkout, без копирования БД/секретов.
 
 Небольшой PR: одна задача, затронутые контракты, тесты и ограничения. Перед merge: backend/tests, check_contracts, frontend check; интегрирует участник 4. Общие файлы — один согласованный PR. Не запускать дополнительных coding-агентов без явного задания и не работать четырьмя агентами в одном checkout.
+
+Независимые задания и критерии: TEAM_TASKS.md. Текущая интеграционная ветка: work/integration-foundation.
