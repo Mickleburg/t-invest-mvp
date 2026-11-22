@@ -12,7 +12,7 @@ def create_app(directory=None,provider=None,test_doubles=False):
     app=api_app(directory=location,model=selected.complete,
                       test_doubles=test_doubles)
     app.state.llm_provider=name
-    app.state.llm_configured=provider is not None or name=='local_codex'
+    app.state.llm_configured=provider is not None or name=='local_codex' or getattr(selected,'configured',False)
     return app
 
 app=create_app()

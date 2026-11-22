@@ -33,7 +33,7 @@ class Service:
                 if e['kind']=='search' and e['status']=='ok':known.update({b['id']:b for b in e['result']['instruments']})
             metadata={'started_at':now(),'prompt_version':VERSION,'prompt_sha256':hashlib.sha256(PROMPT.encode()).hexdigest(),
                       'educational':educational,'request_id':request_id,'messages':[{'role':m['role'],'text':m['text']} for m in state['messages']],
-                      'llm_transport':'local MCP -> Codex CLI structured output','mocked':self.test_doubles}
+                      'llm_transport':'injected LLMProvider','mocked':self.test_doubles}
             (folder/'input.json').write_text(dump(metadata),encoding='utf-8')
             (folder/'instructions.txt').write_text(PROMPT,encoding='utf-8')
             context={'educational':educational,'messages':metadata['messages'][-30:],'known_instruments':list(known.values()),
