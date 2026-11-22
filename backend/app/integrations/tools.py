@@ -93,7 +93,17 @@ def specifications(evidence,uid):
         spec={'evidence_id':item['id'],'lot_size':str(lot) if isinstance(lot,int) and lot>0 else None}
         if instrument['kind']=='future':
             tick=decimal_value(card.get('minPriceIncrement'));money=decimal_value(card.get('minPriceIncrementAmount'))
-            currency=(card.get('minPriceIncrementAmount') or {}).get('currency')
-            if tick and money and currency:spec.update(point_value=str(money/tick),currency=currency.lower())
+            # MCP can return a Quotation (no embedded currency), not MoneyValue.
+            # Future.currency is the settlement currency of the same contract.
+            amount_currency=(card.get('minPriceIncrementAmount') or {}).get('currency')
+            settlement_currency=card.get('currency')
+            if amount_currency and settlement_currency and amount_currency.lower()!=settlement_currency.lower():
+                return None
+            currency=amount_currency or settlement_currency
+            if tick and money and currency:
+                spec.update(point_value=str(money/tick),currency=currency.lower(),
+                            tick_size=str(tick),tick_value=str(money),price_unit='points',
+                            expiration_date=card.get('expirationDate'),last_trade_date=card.get('lastTradeDate'),
+                            observed_at=item.get('observed_at'))
         return spec
     return None

@@ -2,6 +2,7 @@
 import asyncio
 import json
 import logging
+import os
 import ssl
 from contextlib import asynccontextmanager
 
@@ -39,7 +40,13 @@ class SandboxError(Exception):
 
 def http_client(**kwargs):
     # Uses the OS trust store (including locally installed corporate CAs), never verify=False.
-    return httpx.AsyncClient(**kwargs, verify=ssl.create_default_context(), follow_redirects=False)
+    # Corporate proxies may buffer the MCP SSE stream. Direct is the sandbox default;
+    # installations requiring an egress proxy can explicitly opt into env routing.
+    proxy = os.getenv('TINVEST_MCP_USE_PROXY', '0')
+    if proxy not in ('0', '1'):
+        raise ValueError('TINVEST_MCP_USE_PROXY must be 0 or 1')
+    return httpx.AsyncClient(**kwargs, verify=ssl.create_default_context(),
+                             trust_env=proxy == '1', follow_redirects=False)
 
 
 def decode_result(result) -> dict:

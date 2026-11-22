@@ -37,3 +37,5 @@ Linux: backend/.venv/bin/python и export LLM_PROVIDER=local_codex.
 Работают диалог, ограниченные read-only инструменты, история SQLite и расчёт риска. Версионированное подтверждение планов и мониторинг запланированы. PT/DeepSeek API-адаптер реализован; PT deepseek/Reply проверен live. [PT: CA, proxy и smoke](docs/PT_LLM.md). Публичный DeepSeek не проверен. [Запуск](docs/DEVELOPMENT.md), [архитектура](docs/ARCHITECTURE.md), [результаты подготовки](docs/PREPARATION_REPORT.md), [этапы](docs/ROADMAP.md).
 
 Актуальные результаты: [STATUS](docs/STATUS.md), [задания команды](docs/TEAM_TASKS.md), [поведение агента](docs/AGENT.md). Цель MVP — до 1 декабря 2026; Demo Day — 5 декабря.
+
+[Живой сценарий SiZ6: MCP, спецификация, программный риск и UI](docs/MCP_SLICE.md).

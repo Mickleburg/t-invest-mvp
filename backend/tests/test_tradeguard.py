@@ -56,8 +56,8 @@ def test_futures_without_point_value_never_use_stock_formula():
     assert r['status']=='insufficient_data' and 'position_loss' not in r['values']
 
 def test_futures_assumptions_are_labelled_and_mcp_conflict_blocks():
-    text=TEXT+' Стоимость пункта 1000 рублей.'
-    f=risk(instrument_kind='future',point_value={'value':'1000','quote':text},point_value_currency={'value':'rub','quote':text})
+    text=TEXT+' Цены фьючерса заданы в пунктах. Стоимость пункта 1000 рублей.'
+    f=risk(instrument_kind='future',price_currency={'value':'points','quote':text},point_value={'value':'1000','quote':text},point_value_currency={'value':'rub','quote':text})
     r=calculate(f,[text]);assert r['status']=='calculated' and any('не подтверждена' in n for n in r['notes'])
     assert Decimal(r['values']['loss_per_unit'])==6000
     conflict=calculate(f,[text],{'point_value':'500','currency':'rub','lot_size':'1','evidence_id':'spec-test'})

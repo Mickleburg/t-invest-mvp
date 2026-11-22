@@ -45,3 +45,17 @@ OpenAPI/JSON Schema/examples: valid, drift отсутствует; planned route
 ## Новое правило Git
 
 Пользователь поручил после значимых проверенных изменений делать содержательные коммиты с его author/committer, без соавторства агента. GitHub SSH подтвердил аккаунт Mickleburg, текущая Git-идентичность соответствует исходному автору репозитория. Push отдельно не поручен. Предыдущие записи об отсутствии коммитов относятся к этапам до этого поручения.
+
+## Следующий шаг: живой MCP и риск SiZ6
+
+MCP timeout воспроизведён только на proxy/SSE route; напрямую SDK получает 68 инструментов. Добавлена настройка TINVEST_MCP_USE_PROXY (default 0). Исправлено чтение валюты шага из спецификации Quotation, добавлены проверки пунктов и кратности шага. По подтверждённому пользователем нулевому тарифу PT введён явный LLM_ZERO_COST_CONFIRMED, без отмены token/call limits.
+
+Реальный браузерный путь UI → HTTP → PT → search/spec/quote sandbox → Decimal → UI проверен с учебными входными параметрами SiZ6. Бюджет 1000 RUB, риск двух контрактов 2000 RUB, over_budget=true; desktop/mobile без JS ошибок/переполнения. Трасса, источники, воспроизведение и ограничения — MCP_SLICE.md; runtime-артефакты не коммитятся. Качество длинного ответа и самовольного числового сравнения в прозе требует отдельной работы; CP5 целиком не закрыт.
+
+Финальные offline-проверки этого этапа: 70 passed, check_contracts valid/no drift, frontend check, base/VPS Compose config и diff --check прошли. Live-проверки выполнялись отдельно. Глобальные лимиты модели не увеличивались: для UI smoke использованы отдельные 4096 output tokens/90 s. Повторы показывают нестабильность выбора инструментов и ответов; этот долг не скрыт за успешной арифметикой.
+
+Финальный свежий live smoke: exit 0 / passed, два хода, диалог 56afc3de-3a82-4031-ae13-96d6d5c0df55. Получены новый spec_evidence_id и quote реальными MCP-вызовами; screenshots/report сохраняются в backend/runtime/mcp-smoke и исключены из коммита. Это локальный проверенный сценарий, не утверждение готовности всего CP5 или deployment.
+
+Затронуты integrations/tinvest.py и tools.py, llm/external.py, risk/engine.py; tests/test_mcp_slice.py (новый), test_external_llm.py и test_tradeguard.py; scripts/smoke_vertical_slice.py и check_live_slice.py (новые); infra/.env.example и compose.yaml; docs/MCP_SLICE.md (новый), связанные инструкции/статус/roadmap и README. Frontend/src и публичные contracts не менялись.
+
+Оба изолированных сервера остановлены после проверки. Удаление пяти созданных smoke-хранилищ в Windows TEMP автоматическая проверка отклонила (`blocked by policy`), в том числе после отдельной проверки абсолютных путей. Обход удаления не предпринимался; временные каталоги tradeguard-live-smoke-* остались вне Git. Это свежие учебные БД, а не копии рабочих баз; токены в них не записывались.

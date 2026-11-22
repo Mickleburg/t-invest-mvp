@@ -40,6 +40,7 @@ def calculate(inputs:RiskInputs|None,user_messages:list[str],spec=None):
             if lot is not None and lot!=Decimal(spec['lot_size']):missing.append('Пользовательский лот расходится со спецификацией MCP')
             lot=Decimal(spec['lot_size']);spec_source=spec.get('evidence_id')
     elif inputs.instrument_kind=='future':
+        if price_currency!='points':missing.append('Цены фьючерса должны быть явно заданы в пунктах')
         pv=fields.get('point_value');pvc=currency('point_value_currency')
         if spec and spec.get('point_value'):
             supplied=Decimal(spec['point_value'])
@@ -52,6 +53,10 @@ def calculate(inputs:RiskInputs|None,user_messages:list[str],spec=None):
         if lot is None:lot=Decimal(1);notes.append('Считаются целые контракты; биржевая кратность лоту не проверена')
     if missing:return {'status':'insufficient_data','missing':missing,'values':values,'notes':notes}
     entry,stop=fields['entry'],fields['stop']
+    if inputs.instrument_kind=='future' and spec and spec.get('tick_size'):
+        tick=Decimal(spec['tick_size'])
+        if tick<=0 or any(fields[key]%tick!=0 for key in ('entry','stop','target') if key in fields):
+            return {'status':'invalid_inputs','missing':['Цены фьючерса должны быть кратны шагу цены спецификации'],'values':{},'notes':notes}
     if entry<=0 or stop<0 or (inputs.direction=='long' and stop>=entry) or (inputs.direction=='short' and stop<=entry):
         return {'status':'invalid_inputs','missing':['Стоп должен быть ниже входа для long и выше для short; вход положителен'],'values':{},'notes':notes}
     cost=fields.get('costs_per_unit',Decimal(0))

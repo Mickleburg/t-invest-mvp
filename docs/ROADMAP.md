@@ -8,8 +8,8 @@
 | CP1 Specifications | PRODUCT, ARCHITECTURE, AGENT, OWNERSHIP, задачи; ревью команды | Документы подготовлены; утверждение людьми отсутствует | CP0; все |
 | CP2 Contracts | OpenAPI, TradePlan, Protocol, примеры, отсутствие drift | Валидны, provisional; planned API отсутствуют в runtime | CP1; 4 + потребители |
 | CP3 Team Ready | Зоны файлов, отдельные ветки, независимые задания | Техническая основа есть; назначить людей и ревьюеров | CP2; все |
-| CP4 Foundation | HTTP frontend/backend, сменный LLM, живой read-only MCP | HTTP/API-адаптер и live PT deepseek/Reply проверены; MCP timeout | CP2; 2 + 4 |
-| CP5 Vertical Slice | Реальный запрос → агент → MCP → Decimal-риск → UI | Не завершён; doubles не являются live доказательством | CP4; все |
+| CP4 Foundation | HTTP frontend/backend, сменный LLM, живой read-only MCP | HTTP, PT deepseek и live MCP (68 tools) проверены локально; ревью команды отдельно | CP2; 2 + 4 |
+| CP5 Vertical Slice | Реальный запрос → агент → MCP → Decimal-риск → UI | Один live SiZ6 → MCP → Decimal → UI сценарий проверен; качество агента/полнота требуют доработки | CP4; все |
 | CP6 MVP Complete | Правка/подтверждение версии, immutable snapshot, worker, уведомление | Не реализован; есть схема и интерфейсы | CP5; 3 + 1 |
 | CP7 Deployment Ready | VPS, публичный DeepSeek, sandbox, HTTPS, восстановление | Шаблоны есть; Docker Engine и VPS недоступны | CP6; 4 |
 

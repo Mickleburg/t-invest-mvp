@@ -160,3 +160,27 @@ def test_explicit_ca_is_loaded_and_invalid_file_fails_closed(monkeypatch):
     asyncio.run(scenario())
     monkeypatch.setenv('SSL_CERT_FILE', 'nonexistent-corporate-ca.pem')
     with pytest.raises(FileNotFoundError): api_http_client(settings())
+
+
+def test_confirmed_zero_cost_pt_keeps_call_limits():
+    provider=ChatAPIProvider(settings(provider='pt',base_url='https://api-llm.ptsecurity.com/v1',
+        model='deepseek',input_usd_per_million=Decimal(0),output_usd_per_million=Decimal(0),
+        zero_cost_confirmed=True,max_calls=1),transport=httpx.MockTransport(
+        lambda request:httpx.Response(200,json=response(json.dumps(payload())))))
+    assert run(provider)[0].reply==payload()['reply']
+    assert provider.reserved_cost==0 and provider.reserved_tokens>0
+    with pytest.raises(ProviderUnavailable,match='budget exhausted'):run(provider)
+    assert not ChatAPIProvider(settings(input_usd_per_million=Decimal(0),
+        output_usd_per_million=Decimal(0),zero_cost_confirmed=True)).configured
+
+
+def test_zero_cost_env_requires_explicit_confirmation(monkeypatch):
+    monkeypatch.setenv('LLM_API_KEY','TEST DOUBLE')
+    monkeypatch.setenv('LLM_BASE_URL','https://api-llm.ptsecurity.com/v1')
+    monkeypatch.setenv('LLM_MODEL','deepseek')
+    monkeypatch.setenv('LLM_INPUT_USD_PER_MILLION','0')
+    monkeypatch.setenv('LLM_OUTPUT_USD_PER_MILLION','0')
+    monkeypatch.setenv('LLM_ZERO_COST_CONFIRMED','0')
+    assert not ChatAPIProvider(APISettings.from_env('pt')).configured
+    monkeypatch.setenv('LLM_ZERO_COST_CONFIRMED','1')
+    assert ChatAPIProvider(APISettings.from_env('pt')).configured

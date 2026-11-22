@@ -52,6 +52,7 @@ class APISettings:
     max_cost_usd: Decimal = Decimal('1')
     input_usd_per_million: Decimal = Decimal('0')
     output_usd_per_million: Decimal = Decimal('0')
+    zero_cost_confirmed: bool = False
 
     @classmethod
     def from_env(cls, provider):
@@ -68,7 +69,8 @@ class APISettings:
                            int(os.getenv('LLM_MAX_RESERVED_TOKENS', '200000')),
                            Decimal(os.getenv('LLM_MAX_COST_USD', '1')),
                            Decimal(os.getenv('LLM_INPUT_USD_PER_MILLION', '0')),
-                           Decimal(os.getenv('LLM_OUTPUT_USD_PER_MILLION', '0')))
+                           Decimal(os.getenv('LLM_OUTPUT_USD_PER_MILLION', '0')),
+                           zero_cost_confirmed=os.getenv('LLM_ZERO_COST_CONFIRMED','0')=='1')
             settings.validate()
             return settings
         except Exception:
@@ -107,7 +109,10 @@ class ChatAPIProvider:
     @property
     def configured(self):
         s = self.settings
-        return bool(s.api_key and s.input_usd_per_million > 0 and s.output_usd_per_million > 0)
+        priced=s.input_usd_per_million > 0 and s.output_usd_per_million > 0
+        free_pt=(s.provider=='pt' and s.zero_cost_confirmed
+                 and s.input_usd_per_million==0 and s.output_usd_per_million==0)
+        return bool(s.api_key and (priced or free_pt))
 
     async def complete(self, context):
         s = self.settings
@@ -132,6 +137,7 @@ class ChatAPIProvider:
             self.reserved_tokens += tokens
             self.reserved_cost += cost
         # Failed calls keep their reservation. SDK retries disabled: one reservation, one request.
+        phase='request'
         try:
             async with AsyncOpenAI(api_key=s.api_key, base_url=s.base_url, timeout=s.timeout,
                                    max_retries=0,
@@ -140,14 +146,16 @@ class ChatAPIProvider:
                     result = await client.chat.completions.create(
                         model=s.model, messages=messages, max_tokens=s.max_output_tokens,
                         **({'response_format': {'type': 'json_object'}} if s.provider == 'pt' else {}))
+            phase='completion'
             if not result.choices or result.choices[0].finish_reason != 'stop':
                 raise ValueError('Incomplete response')
             message = result.choices[0].message
             if message.tool_calls or not message.content or not message.content.strip():
                 raise ValueError('Unsupported response')
+            phase='reply_schema'
             reply = Reply.model_validate_json(message.content)
             return reply, reply.model_dump()
-        except Exception:
+        except Exception as exc:
             # No provider body, exception text, headers, key or reasoning in logs/artifacts.
-            log.warning('llm.api.failed provider=%s', s.provider)
+            log.warning('llm.api.failed provider=%s phase=%s type=%s', s.provider,phase,type(exc).__name__)
             raise ProviderUnavailable('LLM API unavailable or invalid response') from None
