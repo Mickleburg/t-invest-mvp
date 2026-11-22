@@ -22,7 +22,8 @@ async def smoke(settings, *, reply_schema=False, json_mode=False):
 
     result = {'model': settings.model, 'stage': 'reply' if reply_schema else 'minimal',
               'key_present': bool(settings.api_key), 'http_status': None,
-              'exception_type': None, 'tls_verification': True, 'json_mode': json_mode}
+              'exception_type': None, 'tls_verification': True, 'json_mode': json_mode,
+              'temperature':settings.temperature,'disable_thinking':settings.disable_thinking}
     if not settings.api_key:
         return result | {'exception_type': 'MissingAPIKey'}
     started = time.monotonic()
@@ -38,6 +39,8 @@ async def smoke(settings, *, reply_schema=False, json_mode=False):
                 raw = await client.chat.completions.with_raw_response.create(
                     model=settings.model, messages=messages,
                     max_tokens=settings.max_output_tokens if reply_schema else 128,
+                    **({'temperature':settings.temperature} if settings.temperature is not None else {}),
+                    **({'extra_body':{'chat_template_kwargs':{'enable_thinking':False}}} if settings.disable_thinking else {}),
                     **({'response_format': {'type': 'json_object'}} if json_mode else {}))
                 result['http_status'] = raw.status_code
                 completion = raw.parse()

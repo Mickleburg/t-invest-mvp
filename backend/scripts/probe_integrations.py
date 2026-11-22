@@ -42,6 +42,8 @@ async def probe(mcp=False, llm=False):
                     http_client=api_http_client(settings)) as client:
                 async with asyncio.timeout(45):
                     result = await client.chat.completions.create(model=settings.model, max_tokens=2048,
+                        **({'temperature':settings.temperature} if settings.temperature is not None else {}),
+                        **({'extra_body':{'chat_template_kwargs':{'enable_thinking':False}}} if settings.provider=='pt' and settings.disable_thinking else {}),
                         **({'response_format': {'type': 'json_object'}} if settings.provider == 'pt' else {}),
                         messages=[{'role': 'system', 'content': PROMPT + '\nJSON schema:\n' + json.dumps(Reply.model_json_schema())},
                                   {'role': 'user', 'content': 'Что такое ГО? Кратко, без плана и инструментов.'}])

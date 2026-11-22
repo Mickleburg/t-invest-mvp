@@ -1,10 +1,14 @@
 import asyncio
 import hashlib
 import json
+import re
 from pathlib import Path
 from backend.app.llm.client import discuss
 from .models import Reply
 from .prompt import PROMPT,VERSION
+from .workflow import route_for,next_required,request_key,selected_instrument
+from .presentation import present
+from .grounding import currency_citations
 from backend.app.risk.engine import calculate
 from backend.app.integrations.tools import execute,specifications
 from backend.app.storage.repository import now,dump
@@ -38,44 +42,91 @@ class Service:
             (folder/'instructions.txt').write_text(PROMPT,encoding='utf-8')
             context={'educational':educational,'messages':metadata['messages'][-30:],'known_instruments':list(known.values()),
                      'evidence':self.compact(evidence),'tools_exhausted':False,'current_time_utc':now()}
-            calls=0;attempted=set();status='completed'
+            calls=0;attempted=set();status='completed';turn_evidence=[]
             try:
+                user_messages=[m['text'] for m in state['messages'] if m['role']=='user']
+                route=route_for(user_messages)
+                no_tools=route.education or route.smalltalk
+                controlled=no_tools or bool(route.ticker and route.needs_data)
+                async def run_tool(request):
+                    nonlocal calls
+                    key=request_key(request)
+                    if key in attempted or calls>=3:return
+                    selected=selected_instrument(route,known)
+                    instrument=known.get(request.instrument_id)
+                    if request.kind in ('spec','quote','history','news') and instrument and instrument['kind']=='future':
+                        if selected is None or selected['id']!=request.instrument_id:
+                            attempted.add(key)
+                            context['workflow']={'needs_contract_selection':True}
+                            return
+                    attempted.add(key);calls+=1
+                    e=await self.tool(request,known)
+                    evidence.append(e)
+                    turn_evidence.append(e)
+                    with self.store.connect() as db:db.execute('INSERT INTO evidence VALUES(?,?,?,?)',(e['id'],sid,request_id,dump(e)))
+                    (folder/f'tool-{calls}.json').write_text(dump(e),encoding='utf-8')
+                    if e['kind']=='search' and e['status']=='ok':known.update({b['id']:b for b in e['result']['instruments']})
+                    context.update(evidence=self.compact(evidence),known_instruments=list(known.values()))
+                while calls<3:
+                    request=next_required(route,known,attempted)
+                    if request is None:break
+                    await run_tool(request)
+                context['workflow']={'mode':'education' if route.education else 'conversation' if route.smalltalk else 'trade',
+                    'explicit_ticker':route.ticker,'data_stage_complete':controlled,
+                    'risk_summary_owned_by':'python','max_reply_characters':700}
                 for step in range(3):
-                    context['tools_exhausted']=step==2 or calls>=3
+                    context['tools_exhausted']=controlled or step==2 or calls>=3
                     (folder/f'context-{step}.json').write_text(dump(context),encoding='utf-8')
                     reply,raw=await self.model(context)
                     (folder/f'ai-{step}.json').write_text(dump(raw),encoding='utf-8')
+                    provider_meta=getattr(getattr(self.model,'__self__',None),'last_call',None)
+                    if provider_meta:(folder/f'provider-{step}.json').write_text(dump(provider_meta),encoding='utf-8')
                     if context['tools_exhausted'] or not reply.tool_requests:break
                     for request in reply.tool_requests:
-                        key=dump(request.model_dump())
-                        if key in attempted or calls>=3:continue
-                        attempted.add(key);calls+=1
-                        e=await self.tool(request,known)
-                        evidence.append(e)
-                        with self.store.connect() as db:db.execute('INSERT INTO evidence VALUES(?,?,?,?)',(e['id'],sid,request_id,dump(e)))
-                        (folder/f'tool-{calls}.json').write_text(dump(e),encoding='utf-8')
-                        if e['kind']=='search' and e['status']=='ok':known.update({b['id']:b for b in e['result']['instruments']})
-                    context.update(evidence=self.compact(evidence),known_instruments=list(known.values()))
-                response=reply.model_dump();response['tool_requests']=[]
+                        await run_tool(request)
+                if no_tools:
+                    reply=reply.model_copy(update={'risk_inputs':None,'plan':None,'facts':[],'tool_requests':[]})
                 valid_ids={e['id'] for e in evidence if e['status']=='ok'}
                 if any(f.evidence_id not in valid_ids for f in reply.facts):
                     raise ValueError('Fact references an unavailable source')
                 # A formal source reference is checked; semantic grounding still needs evaluation.
+                risk=currency_citations(reply.risk_inputs,user_messages)
+                if risk is not reply.risk_inputs:reply=reply.model_copy(update={'risk_inputs':risk})
+                selected=selected_instrument(route,known)
+                if risk and selected and risk.instrument_id is None:
+                    risk=risk.model_copy(update={'instrument_id':selected['id'],'instrument_kind':selected['kind']})
+                    reply=reply.model_copy(update={'risk_inputs':risk})
+                if risk and risk.instrument_id and risk.instrument_id not in known:raise ValueError('Unknown risk instrument')
+                if risk and selected and risk.instrument_id!=selected['id']:raise ValueError('Risk instrument differs from user selection')
+                if risk and risk.instrument_id and known[risk.instrument_id]['kind']!=risk.instrument_kind:raise ValueError('Risk instrument kind mismatch')
+                refreshed=any(e['kind'] in ('spec','quote') for e in turn_evidence)
+                current_evidence=turn_evidence if controlled or refreshed else evidence
+                spec=specifications(current_evidence,risk.instrument_id) if risk and risk.instrument_id else None
+                calc=calculate(risk,user_messages,spec)
+                if risk and risk.instrument_kind=='future' and selected is None:
+                    calc={'status':'insufficient_data','missing':['Конкретный контракт не найден однозначно; уточните инструмент и класс'],'values':{},'notes':[]}
+                elif risk and risk.instrument_kind=='future' and controlled and not (spec and spec.get('point_value') and spec.get('lot_size')):
+                    calc={'status':'insufficient_data','missing':['Свежая проверенная спецификация контракта недоступна'],'values':{},'notes':[]}
+                risk_requested=not no_tools and bool(re.search(r'капитал|стоп|риск',text,re.I))
+                response,audit=present(reply,calc,current_evidence,known,no_tools,risk_requested,
+                                       selected['id'] if selected else None)
+                if not selected and any(i['kind']=='future' for i in known.values()) and not no_tools:
+                    response['questions']=['Какой конкретный контракт и срок экспирации вы выбрали?']
+                (folder/'quality.json').write_text(dump(audit),encoding='utf-8')
                 if reply.plan and reply.plan.status=='reviewable' and (reply.plan.missing or reply.risk_inputs is None):
                     response['plan']['status']='preliminary'
-                risk=reply.risk_inputs
-                if risk and risk.instrument_id and risk.instrument_id not in known:raise ValueError('Unknown risk instrument')
-                if risk and risk.instrument_id and known[risk.instrument_id]['kind']!=risk.instrument_kind:raise ValueError('Risk instrument kind mismatch')
-                user_messages=[m['text'] for m in state['messages'] if m['role']=='user']
-                calc=calculate(risk,user_messages,specifications(evidence,risk.instrument_id) if risk and risk.instrument_id else None)
                 response.update(risk_calculation=calc,prompt_version=VERSION,artifact_id=request_id)
                 if response['plan'] and (calc['status']!='calculated' or calc['values'].get('over_budget')):response['plan']['status']='preliminary'
-                shown=reply.reply
-                if reply.questions:shown+='\n\n'+'\n\n'.join(reply.questions)
+                shown=response['reply']
+                if response['questions']:shown+='\n\n'+'\n\n'.join(response['questions'])
                 self.store.message(sid,'assistant',shown,response)
             except Exception as exc:
                 status='failed'
-                (folder/'error.json').write_text(dump({'type':type(exc).__name__,'time':now(),'code':'dialogue_failed'}),encoding='utf-8')
+                codes={'Fact references an unavailable source':'invalid_fact_reference',
+                       'Unknown risk instrument':'unknown_risk_instrument',
+                       'Risk instrument kind mismatch':'risk_instrument_kind_mismatch'}
+                code=codes.get(str(exc),'dialogue_failed') if isinstance(exc,ValueError) else 'dialogue_failed'
+                (folder/'error.json').write_text(dump({'type':type(exc).__name__,'time':now(),'code':code}),encoding='utf-8')
                 self.store.message(sid,'assistant','Не удалось получить проверяемый ответ агента. Ваше сообщение сохранено. Новые данные не выдуманы; можно повторить запрос или начать новый диалог.',{'error':'dialogue_failed','artifact_id':request_id})
             finally:
                 with self.store.connect() as db:

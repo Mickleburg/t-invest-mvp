@@ -53,15 +53,21 @@ class APISettings:
     input_usd_per_million: Decimal = Decimal('0')
     output_usd_per_million: Decimal = Decimal('0')
     zero_cost_confirmed: bool = False
+    temperature: float|None = 0.0
+    disable_thinking: bool = False
 
     @classmethod
     def from_env(cls, provider):
         defaults = {'pt': ('https://api-llm.ptsecurity.com/v1', 'deepseek'),
                     'deepseek': ('https://api.deepseek.com', 'deepseek-flash')}
         base, model = defaults[provider]
+        model=os.getenv('LLM_MODEL',model)
+        thinking_default='1' if provider=='pt' and model in ('deepseek','qwen35-122b-a10b','positive-llm-qwen36') else '0'
         try:
+            thinking_setting=os.getenv('LLM_DISABLE_THINKING') or thinking_default
+            if thinking_setting not in ('0','1'):raise ValueError('Invalid thinking setting')
             settings = cls(provider, os.getenv('LLM_BASE_URL', base),
-                           os.getenv('LLM_MODEL', model), os.getenv('LLM_API_KEY', ''),
+                           model, os.getenv('LLM_API_KEY', ''),
                            float(os.getenv('LLM_TIMEOUT_SECONDS', '45')),
                            int(os.getenv('LLM_MAX_OUTPUT_TOKENS', '2048')),
                            int(os.getenv('LLM_MAX_INPUT_BYTES', '60000')),
@@ -70,7 +76,9 @@ class APISettings:
                            Decimal(os.getenv('LLM_MAX_COST_USD', '1')),
                            Decimal(os.getenv('LLM_INPUT_USD_PER_MILLION', '0')),
                            Decimal(os.getenv('LLM_OUTPUT_USD_PER_MILLION', '0')),
-                           zero_cost_confirmed=os.getenv('LLM_ZERO_COST_CONFIRMED','0')=='1')
+                           zero_cost_confirmed=os.getenv('LLM_ZERO_COST_CONFIRMED','0')=='1',
+                           temperature=float(os.getenv('LLM_TEMPERATURE','0')) if os.getenv('LLM_TEMPERATURE','0') else None,
+                           disable_thinking=thinking_setting=='1')
             settings.validate()
             return settings
         except Exception:
@@ -94,6 +102,8 @@ class APISettings:
         for value in (self.input_usd_per_million, self.output_usd_per_million):
             if not value.is_finite() or value < 0:
                 raise ValueError('Invalid price')
+        if self.temperature is not None and (not Decimal(str(self.temperature)).is_finite() or not 0<=self.temperature<=2):
+            raise ValueError('Invalid temperature')
 
 
 class ChatAPIProvider:
@@ -105,6 +115,7 @@ class ChatAPIProvider:
         self.reserved_tokens = 0
         self.reserved_cost = Decimal('0')
         self.lock = asyncio.Lock()
+        self.last_call = None
 
     @property
     def configured(self):
@@ -145,8 +156,13 @@ class ChatAPIProvider:
                 async with asyncio.timeout(s.timeout):
                     result = await client.chat.completions.create(
                         model=s.model, messages=messages, max_tokens=s.max_output_tokens,
+                        **({'temperature':s.temperature} if s.temperature is not None else {}),
+                        **({'extra_body':{'chat_template_kwargs':{'enable_thinking':False}}} if s.provider=='pt' and s.disable_thinking else {}),
                         **({'response_format': {'type': 'json_object'}} if s.provider == 'pt' else {}))
             phase='completion'
+            self.last_call={'requested_model':s.model,'response_model':result.model,
+                'temperature':s.temperature,'disable_thinking':s.disable_thinking,
+                'max_output_tokens':s.max_output_tokens,'finish_reason':result.choices[0].finish_reason if result.choices else None}
             if not result.choices or result.choices[0].finish_reason != 'stop':
                 raise ValueError('Incomplete response')
             message = result.choices[0].message

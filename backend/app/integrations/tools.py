@@ -1,5 +1,6 @@
 """Small read-only tool dispatcher; no arbitrary tool names or execution."""
 import asyncio
+import re
 from datetime import datetime,timedelta,timezone
 from uuid import uuid4
 from backend.app.integrations.tinvest import sandbox_session,ENDPOINT,SandboxError
@@ -63,6 +64,9 @@ async def execute(request,known):
             current=datetime.now(timezone.utc);key=instrument_key(selected)
             if request.kind=='quote':
                 raw=await bank('invest_get_market_values',{'instrumentId':[key],'values':['INSTRUMENT_VALUE_LAST_PRICE']})
+                for row in raw.get('instruments',[]):
+                    if row.get('ticker')!=selected['ticker'] or row.get('classCode')!=selected['class_code']:
+                        raise ValueError('instrument_mismatch')
             elif request.kind=='history':
                 raw=await bank('invest_get_candles',{'instrumentId':key,'interval':'CANDLE_INTERVAL_DAY',
                                'from':(current-timedelta(days=30)).isoformat(),'to':current.isoformat(),'limit':35})
@@ -90,7 +94,7 @@ def specifications(evidence,uid):
         result=item['result'];instrument=result.get('instrument',{})
         if instrument.get('id')!=uid:continue
         card=result['data'].get('instrument',{});lot=card.get('lot')
-        spec={'evidence_id':item['id'],'lot_size':str(lot) if isinstance(lot,int) and lot>0 else None}
+        spec={'evidence_id':item['id'],'lot_size':str(lot) if type(lot) is int and lot>0 else None}
         if instrument['kind']=='future':
             tick=decimal_value(card.get('minPriceIncrement'));money=decimal_value(card.get('minPriceIncrementAmount'))
             # MCP can return a Quotation (no embedded currency), not MoneyValue.
@@ -100,7 +104,7 @@ def specifications(evidence,uid):
             if amount_currency and settlement_currency and amount_currency.lower()!=settlement_currency.lower():
                 return None
             currency=amount_currency or settlement_currency
-            if tick and money and currency:
+            if tick and money and isinstance(currency,str) and re.fullmatch(r'[a-zA-Z]{3}',currency):
                 spec.update(point_value=str(money/tick),currency=currency.lower(),
                             tick_size=str(tick),tick_value=str(money),price_unit='points',
                             expiration_date=card.get('expirationDate'),last_trade_date=card.get('lastTradeDate'),

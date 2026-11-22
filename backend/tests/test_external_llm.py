@@ -184,3 +184,33 @@ def test_zero_cost_env_requires_explicit_confirmation(monkeypatch):
     assert not ChatAPIProvider(APISettings.from_env('pt')).configured
     monkeypatch.setenv('LLM_ZERO_COST_CONFIRMED','1')
     assert ChatAPIProvider(APISettings.from_env('pt')).configured
+
+
+def test_pt_generation_settings_and_model_identity():
+    def handle(request):
+        body=json.loads(request.content)
+        assert body['temperature']==0 and body['chat_template_kwargs']=={'enable_thinking':False}
+        return httpx.Response(200,json=response(json.dumps(payload()))|{'model':'ACTUAL-TEST-MODEL'})
+    provider=ChatAPIProvider(settings(provider='pt',base_url='https://api-llm.ptsecurity.com/v1',
+        model='qwen35-122b-a10b',temperature=0,disable_thinking=True),transport=httpx.MockTransport(handle))
+    run(provider)
+    assert provider.last_call['response_model']=='ACTUAL-TEST-MODEL'
+    assert provider.last_call['requested_model']=='qwen35-122b-a10b'
+
+
+@pytest.mark.parametrize('temperature',[-.1,2.1,float('nan')])
+def test_invalid_temperature_fails_before_network(temperature):
+    with pytest.raises(ValueError):ChatAPIProvider(settings(temperature=temperature))
+
+
+def test_default_pt_profile_is_explicit_and_can_be_overridden(monkeypatch):
+    monkeypatch.delenv('LLM_MODEL',raising=False)
+    monkeypatch.delenv('LLM_BASE_URL',raising=False)
+    monkeypatch.setenv('LLM_DISABLE_THINKING','')
+    monkeypatch.setenv('LLM_TEMPERATURE','0')
+    selected=APISettings.from_env('pt')
+    assert selected.model=='deepseek' and selected.disable_thinking and selected.temperature==0
+    monkeypatch.setenv('LLM_DISABLE_THINKING','0')
+    assert not APISettings.from_env('pt').disable_thinking
+    monkeypatch.setenv('LLM_DISABLE_THINKING','typo')
+    with pytest.raises(ValueError):APISettings.from_env('pt')
