@@ -87,3 +87,7 @@ Health — процесс/конфигурация, не готовность LL
 PT: исправление proxy/CA, реальные результаты и отдельный smoke — [PT_LLM.md](PT_LLM.md). Windows использует системные CA; Docker/Linux — read-only PEM через SSL_CERT_FILE. MCP timeout диагностируется независимо.
 
 Живой MCP и сценарий SiZ6: [MCP_SLICE.md](MCP_SLICE.md). TINVEST_MCP_USE_PROXY=0 задаёт прямой sandbox SSE transport; 1 использует env proxy. Проверяемый UI smoke запускается на отдельных портах с временной БД и реальными PT/MCP.
+
+## Проверенный PT-профиль CP5
+
+LLM_MODEL=deepseek, LLM_TEMPERATURE=0, LLM_DISABLE_THINKING=1 (PT chat_template_kwargs.enable_thinking=false), output 2048, timeout 45 s. Пустой thinking flag выбирает проверенный default для PT deepseek/Qwen. Qwen35 — проверенная альтернатива; local_codex — реальный локальный CLI provider для разработки. Настройки, сравнительные результаты и opt-in команды: CP5_EVALUATION.md. Публичный API этого корпоративного параметра не получает.

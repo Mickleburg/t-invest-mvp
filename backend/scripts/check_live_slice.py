@@ -32,6 +32,7 @@ async def check(url, output):
         page.on('pageerror',lambda error:errors.append(type(error).__name__))
         try:
             await page.goto(url,wait_until='networkidle')
+            report['provider']=(await (await page.request.get(url+'/api/health')).json())['llm_provider']
             await page.locator('#input').wait_for(state='visible')
             # The frontend opens the most recent session on first load. Start a
             # fresh one so a repeat cannot pass using earlier evidence/results.
@@ -44,21 +45,18 @@ async def check(url, output):
                     await page.locator('#send').click()
                 response=await pending.value
                 assert response.status==200
+                if response.headers.get('x-smoke-model-calls'):
+                    report['model_calls']=int(response.headers['x-smoke-model-calls'])
+                    assert report['model_calls']==1,'Extra model round'
                 return await response.json()
             state=await send(TEXT)
             report['turns']=1
-            # The agent may spend its first tool budget clarifying/searching.
-            # A real follow-up completes the same scenario, without injecting data.
-            if not any(e['kind']=='quote' and e['status']=='ok' for e in state['evidence']):
-                state=await send('Теперь запроси последнюю доступную котировку через quote для уже найденного SiZ6. '
-                    'Повторять search не нужно; если спецификации ещё нет, запроси spec. '
-                    'Сохрани исходные учебные параметры в risk_inputs: капитал 100000 рублей, риск 1%, '
-                    'вход 100000 пунктов, стоп 99000 пунктов, long, количество 2 контракта.')
-                report['turns']=2
             (output/'state.json').write_text(json.dumps(state,ensure_ascii=False,indent=2),encoding='utf-8')
             latest=next(m for m in reversed(state['messages']) if m['role']=='assistant')
             assert not latest['response'].get('error'), 'Agent returned an error'
             evidence=state['evidence']
+            assert [e['kind'] for e in evidence]==['search','spec','quote'], 'Unexpected tool sequence'
+            assert len(latest['text'])<=1000 and '%' not in latest['text'], 'Unbounded or numeric prose'
             instrument=next(i for e in evidence if e['kind']=='search' and e['status']=='ok'
                             for i in e['result']['instruments'] if i['ticker']=='SiZ6' and i['kind']=='future')
             spec=specifications(evidence,instrument['id'])

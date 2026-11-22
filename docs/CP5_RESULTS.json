@@ -1,0 +1,692 @@
+{
+  "prompt_version": "tradeguard-dialogue-v3.1",
+  "prompt_sha256": "ddd2d7a34cc1ea0738d3ae6a225d38b82c62133c973305509bbc029891319faa",
+  "generated_at_utc": "2026-11-22T21:19:41.474845+00:00",
+  "scope": "CP5 technical acceptance; team approval remains separate",
+  "offline_tests_passed": 95,
+  "profiles": {
+    "deepseek_tuned": {
+      "passed": 6,
+      "total": 6,
+      "median_seconds": 4.133,
+      "raw_report_sha256": "055eead55913bc04b3f62bd2acf84d8af81e13bc0bea0ca4e1e382c6e9fb1aec",
+      "runtime_report": "backend/runtime/cp5-eval/acceptance-deepseek-thinking-off/results.json",
+      "cases": [
+        {
+          "case": "education",
+          "result": "passed",
+          "tool_kinds": [],
+          "model_calls": 1,
+          "reply_characters": 407,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 2.319,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-1",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 341,
+          "risk_status": "calculated",
+          "elapsed_seconds": 4.269,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-2",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 281,
+          "risk_status": "calculated",
+          "elapsed_seconds": 4.848,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-3",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 349,
+          "risk_status": "calculated",
+          "elapsed_seconds": 3.998,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "missing-stop",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 348,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 3.897,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "ambiguous",
+          "result": "passed",
+          "tool_kinds": [
+            "search"
+          ],
+          "model_calls": 2,
+          "reply_characters": 391,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 8.656,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        }
+      ],
+      "prompt_versions": [
+        "tradeguard-dialogue-v3.1"
+      ],
+      "prompt_sha256s": [
+        "ddd2d7a34cc1ea0738d3ae6a225d38b82c62133c973305509bbc029891319faa"
+      ],
+      "intermediate_before_final_prompt": false
+    },
+    "qwen35_tuned": {
+      "passed": 6,
+      "total": 6,
+      "median_seconds": 4.441,
+      "raw_report_sha256": "2617e83a699de8867620700e1a41050101c591a9614046dd5cb9b90476515011",
+      "runtime_report": "backend/runtime/cp5-eval/acceptance-qwen35/results.json",
+      "cases": [
+        {
+          "case": "education",
+          "result": "passed",
+          "tool_kinds": [],
+          "model_calls": 1,
+          "reply_characters": 303,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 2.18,
+          "actual_settings": {
+            "requested_model": "qwen35-122b-a10b",
+            "response_model": "Qwen/Qwen35-122B-A10B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-1",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 284,
+          "risk_status": "calculated",
+          "elapsed_seconds": 4.326,
+          "actual_settings": {
+            "requested_model": "qwen35-122b-a10b",
+            "response_model": "Qwen/Qwen35-122B-A10B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-2",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 308,
+          "risk_status": "calculated",
+          "elapsed_seconds": 5.085,
+          "actual_settings": {
+            "requested_model": "qwen35-122b-a10b",
+            "response_model": "Qwen/Qwen35-122B-A10B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-3",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 380,
+          "risk_status": "calculated",
+          "elapsed_seconds": 4.556,
+          "actual_settings": {
+            "requested_model": "qwen35-122b-a10b",
+            "response_model": "Qwen/Qwen35-122B-A10B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "missing-stop",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 277,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 4.292,
+          "actual_settings": {
+            "requested_model": "qwen35-122b-a10b",
+            "response_model": "Qwen/Qwen35-122B-A10B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "ambiguous",
+          "result": "passed",
+          "tool_kinds": [
+            "search"
+          ],
+          "model_calls": 2,
+          "reply_characters": 214,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 4.999,
+          "actual_settings": {
+            "requested_model": "qwen35-122b-a10b",
+            "response_model": "Qwen/Qwen35-122B-A10B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        }
+      ],
+      "prompt_versions": [
+        "tradeguard-dialogue-v3.1"
+      ],
+      "prompt_sha256s": [
+        "ddd2d7a34cc1ea0738d3ae6a225d38b82c62133c973305509bbc029891319faa"
+      ],
+      "intermediate_before_final_prompt": false
+    },
+    "qwen36_tuned": {
+      "passed": 4,
+      "total": 6,
+      "median_seconds": 4.524,
+      "raw_report_sha256": "3c5a654de6d65a03482e20236c44e339d2ef8af2d91375813483e22b7c5a66bb",
+      "runtime_report": "backend/runtime/cp5-eval/acceptance-qwen36/results.json",
+      "cases": [
+        {
+          "case": "education",
+          "result": "passed",
+          "tool_kinds": [],
+          "model_calls": 1,
+          "reply_characters": 410,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 2.194,
+          "actual_settings": {
+            "requested_model": "positive-llm-qwen36",
+            "response_model": "Qwen/Qwen36-35B-A3B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-1",
+          "result": "failed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 199,
+          "risk_status": "invalid_inputs",
+          "elapsed_seconds": 4.641,
+          "actual_settings": {
+            "requested_model": "positive-llm-qwen36",
+            "response_model": "Qwen/Qwen36-35B-A3B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-2",
+          "result": "failed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 199,
+          "risk_status": "invalid_inputs",
+          "elapsed_seconds": 4.665,
+          "actual_settings": {
+            "requested_model": "positive-llm-qwen36",
+            "response_model": "Qwen/Qwen36-35B-A3B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-3",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 372,
+          "risk_status": "calculated",
+          "elapsed_seconds": 4.81,
+          "actual_settings": {
+            "requested_model": "positive-llm-qwen36",
+            "response_model": "Qwen/Qwen36-35B-A3B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "missing-stop",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 284,
+          "risk_status": "invalid_inputs",
+          "elapsed_seconds": 4.406,
+          "actual_settings": {
+            "requested_model": "positive-llm-qwen36",
+            "response_model": "Qwen/Qwen36-35B-A3B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "ambiguous",
+          "result": "passed",
+          "tool_kinds": [
+            "search"
+          ],
+          "model_calls": 2,
+          "reply_characters": 208,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 3.522,
+          "actual_settings": {
+            "requested_model": "positive-llm-qwen36",
+            "response_model": "Qwen/Qwen36-35B-A3B-FP8",
+            "temperature": 0.0,
+            "disable_thinking": true,
+            "max_output_tokens": 2048,
+            "finish_reason": "stop"
+          }
+        }
+      ],
+      "prompt_versions": [
+        "tradeguard-dialogue-v3.1"
+      ],
+      "prompt_sha256s": [
+        "ddd2d7a34cc1ea0738d3ae6a225d38b82c62133c973305509bbc029891319faa"
+      ],
+      "intermediate_before_final_prompt": false
+    },
+    "local_codex": {
+      "passed": 6,
+      "total": 6,
+      "median_seconds": 19.83,
+      "raw_report_sha256": "5dd94e50bca13d009f5e42df6e21c8664f5938ce734addba4a18107116946387",
+      "runtime_report": "backend/runtime/cp5-eval/acceptance-codex/results.json",
+      "cases": [
+        {
+          "case": "education",
+          "result": "passed",
+          "tool_kinds": [],
+          "model_calls": 1,
+          "reply_characters": 155,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 15.821,
+          "actual_settings": null
+        },
+        {
+          "case": "future-1",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 212,
+          "risk_status": "calculated",
+          "elapsed_seconds": 19.318,
+          "actual_settings": null
+        },
+        {
+          "case": "future-2",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 212,
+          "risk_status": "calculated",
+          "elapsed_seconds": 20.341,
+          "actual_settings": null
+        },
+        {
+          "case": "future-3",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 212,
+          "risk_status": "calculated",
+          "elapsed_seconds": 20.708,
+          "actual_settings": null
+        },
+        {
+          "case": "missing-stop",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 253,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 18.907,
+          "actual_settings": null
+        },
+        {
+          "case": "ambiguous",
+          "result": "passed",
+          "tool_kinds": [
+            "search"
+          ],
+          "model_calls": 2,
+          "reply_characters": 315,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 31.273,
+          "actual_settings": null
+        }
+      ],
+      "prompt_versions": [
+        "tradeguard-dialogue-v3.1"
+      ],
+      "prompt_sha256s": [
+        "ddd2d7a34cc1ea0738d3ae6a225d38b82c62133c973305509bbc029891319faa"
+      ],
+      "intermediate_before_final_prompt": false
+    },
+    "deepseek_untuned_intermediate": {
+      "passed": 5,
+      "total": 6,
+      "median_seconds": 17.227,
+      "raw_report_sha256": "675423e44561dff6e0269d827b7eb8e47e97e730e5fa8757a696e8a2cb344181",
+      "runtime_report": "backend/runtime/cp5-eval/final-deepseek/results.json",
+      "cases": [
+        {
+          "case": "education",
+          "result": "passed",
+          "tool_kinds": [],
+          "model_calls": 1,
+          "reply_characters": 430,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 4.428,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": false,
+            "max_output_tokens": 4096,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-1",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 294,
+          "risk_status": "calculated",
+          "elapsed_seconds": 15.871,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": false,
+            "max_output_tokens": 4096,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "future-2",
+          "result": "failed",
+          "tool_kinds": null,
+          "model_calls": null,
+          "reply_characters": null,
+          "risk_status": null,
+          "elapsed_seconds": 28.837,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": false,
+            "max_output_tokens": 4096,
+            "finish_reason": "length"
+          }
+        },
+        {
+          "case": "future-3",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 360,
+          "risk_status": "calculated",
+          "elapsed_seconds": 25.866,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": false,
+            "max_output_tokens": 4096,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "missing-stop",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "spec",
+            "quote"
+          ],
+          "model_calls": 1,
+          "reply_characters": 335,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 16.965,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": false,
+            "max_output_tokens": 4096,
+            "finish_reason": "stop"
+          }
+        },
+        {
+          "case": "ambiguous",
+          "result": "passed",
+          "tool_kinds": [
+            "search",
+            "search"
+          ],
+          "model_calls": 2,
+          "reply_characters": 217,
+          "risk_status": "insufficient_data",
+          "elapsed_seconds": 17.49,
+          "actual_settings": {
+            "requested_model": "deepseek",
+            "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+            "temperature": 0.0,
+            "disable_thinking": false,
+            "max_output_tokens": 4096,
+            "finish_reason": "stop"
+          }
+        }
+      ],
+      "prompt_versions": [
+        "intermediate-v3"
+      ],
+      "prompt_sha256s": [],
+      "intermediate_before_final_prompt": true
+    }
+  },
+  "browser": {
+    "deepseek": {
+      "result": "passed",
+      "provider": "pt",
+      "turns": 1,
+      "model_calls": 1,
+      "session_id": "e668b1d5-3e58-43b0-8c7c-5f31503be1c6",
+      "tools": [
+        "invest_find_instrument",
+        "invest_get_future",
+        "invest_get_market_values"
+      ],
+      "browser_errors": [],
+      "runtime_report": "backend/runtime/cp5-eval/ui-deepseek/report.json",
+      "raw_report_sha256": "4b1b5417f8ae51fce76eaed68b614be5cb403e87e398889c233ea60ba2573fa0"
+    },
+    "qwen35": {
+      "result": "passed",
+      "provider": "pt",
+      "turns": 1,
+      "model_calls": 1,
+      "session_id": "98089cd9-175a-4b77-b9fb-0963f5924204",
+      "tools": [
+        "invest_find_instrument",
+        "invest_get_future",
+        "invest_get_market_values"
+      ],
+      "browser_errors": [],
+      "runtime_report": "backend/runtime/cp5-eval/ui-qwen35/report.json",
+      "raw_report_sha256": "cb57c335c528e18fc7a70fd14491e98b18df41f441c591cd5c43456156794c69"
+    },
+    "codex": {
+      "result": "passed",
+      "provider": "local_codex",
+      "turns": 1,
+      "model_calls": 1,
+      "session_id": "fb6682f4-19a1-482f-b84e-48f72da3dc92",
+      "tools": [
+        "invest_find_instrument",
+        "invest_get_future",
+        "invest_get_market_values"
+      ],
+      "browser_errors": [],
+      "runtime_report": "backend/runtime/cp5-eval/ui-codex/report.json",
+      "raw_report_sha256": "89b9cb24dcb0dc1fb04f939ccfd9c63c33577f2e69b63ef9b39a7f26292700a1"
+    }
+  },
+  "public_contracts_changed": false,
+  "trading": false,
+  "technical_status": "passed"
+}

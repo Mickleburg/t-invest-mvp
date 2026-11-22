@@ -59,3 +59,13 @@ MCP timeout воспроизведён только на proxy/SSE route; нап
 Затронуты integrations/tinvest.py и tools.py, llm/external.py, risk/engine.py; tests/test_mcp_slice.py (новый), test_external_llm.py и test_tradeguard.py; scripts/smoke_vertical_slice.py и check_live_slice.py (новые); infra/.env.example и compose.yaml; docs/MCP_SLICE.md (новый), связанные инструкции/статус/roadmap и README. Frontend/src и публичные contracts не менялись.
 
 Оба изолированных сервера остановлены после проверки. Удаление пяти созданных smoke-хранилищ в Windows TEMP автоматическая проверка отклонила (`blocked by policy`), в том числе после отдельной проверки абсолютных путей. Обход удаления не предпринимался; временные каталоги tradeguard-live-smoke-* остались вне Git. Это свежие учебные БД, а не копии рабочих баз; токены в них не записывались.
+
+## CP5: стабилизация провайдера и поведения
+
+Проверены PT deepseek, qwen35-122b-a10b, positive-llm-qwen36, positive-llm-code и настоящий local_codex. Deepseek остался основным с temperature=0 и enable_thinking=false. Для него, Qwen35 и Codex прошли по 6 живых случаев, включая 3 свежих расчётных диалога. В UI каждый из трёх провайдеров прошёл один ход/одно обращение модели на desktop/mobile.
+
+Добавлены workflow/presentation/grounding: для явного контракта стабильные search/spec/quote, образовательный запрос без MCP, короткая проза и вычисления только в программной карточке/серверных фактах. Проверены враждебные длинные ответы, цифровая/словесная арифметика, неизвестные источники, пустые ответы, неоднозначность, дословные цитаты, свежий отказ спецификации.
+
+95 offline test passed, check_contracts valid/no drift, frontend check и обе Compose config прошли. Артефакты и границы — CP5_EVALUATION.md, машинная сводка — CP5_RESULTS.json. Технические критерии CP5 выполнены для указанного набора; командное закрытие/утверждение не объявлено. CP6/CP7 не реализованы. Новые одноразовые smoke backend штатно остановились и удалили свои временные БД; старые TEMP-каталоги предыдущего этапа не трогались.
+
+Затронутые файлы CP5: agent/prompt.py, service.py и новые workflow.py/presentation.py/grounding.py; llm/external.py; integrations/tools.py; новый tests/test_cp5.py и test_external_llm.py; новые scripts/compare_providers.py/evaluate_cp5.py, обновлённые check_live_slice.py/smoke_vertical_slice.py и диагностические probe_integrations.py/smoke_pt_llm.py; infra/compose.yaml и .env.example; README и связанные docs, включая новые CP5_EVALUATION.md и CP5_RESULTS.json. Frontend/src, публичные contracts, Risk Engine и рабочие БД не менялись. Все одноразовые backend завершились штатно; отдельный тестовый frontend остановлен.

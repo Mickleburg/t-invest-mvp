@@ -16,7 +16,7 @@ frontend/src → HTTP /api/ через Node proxy → backend/app/main.py → ap
 
 Это перенос использовавшегося кода без второй реализации агента или Risk Engine. Из старого карточного PoC взяты только нужные функции идентификации бумаг и чтения Decimal.
 
-Композиция внедряет LLMProvider.complete в Service. local_codex использует локальный MCP → Codex CLI; disabled и зарезервированный external_api возвращают недоступность. pt/deepseek используют OpenAI SDK через llm/external.py: HTTPS, тайм-аут, без SDK retries/native tools, локальная валидация Reply и лимиты. PT deepseek проверен live с JSON object mode; публичный DeepSeek не проверен. TLS/NO_PROXY — docs/PT_LLM.md. Инструкции диалога остались tradeguard-dialogue-v2.
+Композиция внедряет LLMProvider.complete в Service. local_codex использует локальный MCP → Codex CLI; disabled и зарезервированный external_api возвращают недоступность. pt/deepseek используют OpenAI SDK через llm/external.py: HTTPS, тайм-аут, без SDK retries/native tools, локальная валидация Reply и лимиты. PT deepseek проверен live с JSON object mode; публичный DeepSeek не проверен. TLS/NO_PROXY — docs/PT_LLM.md. Инструкции обновлены до tradeguard-dialogue-v3.1; параметры PT проверены по фактическому response model.
 
 Данные — backend/runtime/ либо TRADEGUARD_DATA. Runtime нового MVP перемещён без изменения схемы и копирования БД. Старые базы не объединялись. Пока допустим один процесс backend: startup сбрасывает прерванные ходы.
 
@@ -39,3 +39,5 @@ ProviderUnavailable означает недоступность провайде
 API-provider внедряется через прежний LLMProvider.complete; агент не меняется при смене pt/deepseek. Цены задаются явно; нулевые цены блокируют запросы, кроме явно подтверждённого бесплатного PT-тарифа. Бюджет резервируется на процесс и сбрасывается при рестарте; это не общий биллинг. Подробные ограничения — DEVELOPMENT.md. Caddy/VPS overlay — шаблон, не состоявшийся deployment. Worker не создавался: без confirmed repository он не мог бы проверять подтверждённые условия. Нумерация CP заменена в ROADMAP.md; старые CP3 в этом тексте означают будущий workflow CP6.
 
 Живой локальный путь frontend → PT → sandbox MCP → Decimal → UI проверен для SiZ6; транспорт MCP использует явную настройку proxy. Чтение валюты стоимости шага исправлено для Quotation; цены фьючерса проверяются в пунктах и по шагу. Протокол и ограничения — MCP_SLICE.md.
+
+CP5: Service вызывает детерминированный workflow для явно выбранного фьючерса перед единственной генерацией; образовательный запрос исключает торговые инструменты. Риск-сводку и численные факты строит presentation из кода/источников; длина прозы ограничена. Все исходные LLM-ответы остаются во внутренних артефактах для аудита. Критерии и границы — CP5_EVALUATION.md.
