@@ -1,0 +1,148 @@
+{
+  "date_moscow": "2026-11-23",
+  "technical_status": "passed_ready_for_human_review",
+  "team_approval": false,
+  "offline": {
+    "tests_passed": 136,
+    "cp6_tests": 41,
+    "contract_drift": false,
+    "planned_operations": 0,
+    "frontend_check": "passed",
+    "compose_base": "valid",
+    "compose_vps": "valid"
+  },
+  "runs": [
+    {
+      "mode": "fixture",
+      "result": "passed",
+      "synthetic_sources": true,
+      "model_calls": 1,
+      "provider": null,
+      "initial_tools": [
+        "search",
+        "spec",
+        "quote"
+      ],
+      "draft_version": 3,
+      "confirmed_version": 2,
+      "checks_after_restart": 2,
+      "check_statuses": [
+        "satisfied"
+      ],
+      "notifications": 1,
+      "delivery_statuses": [
+        "delivered"
+      ],
+      "snapshot_unchanged": true,
+      "backend_restarted": true,
+      "browser_errors": [],
+      "mobile_overflow": false,
+      "last_quote": {
+        "instrument": {
+          "id": "CP6-TEST-DOUBLE",
+          "ticker": "SiZ6",
+          "class_code": "SPBFUT",
+          "kind": "future",
+          "exact_match": true
+        },
+        "data": {
+          "instruments": [
+            {
+              "ticker": "SiZ6",
+              "classCode": "SPBFUT",
+              "priceCurrency": "pt.",
+              "values": [
+                {
+                  "type": "INSTRUMENT_VALUE_LAST_PRICE",
+                  "value": {
+                    "value": "98000"
+                  },
+                  "time": "2026-11-22T22:13:53.854079+00:00"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "artifacts": {
+        "backend\\runtime\\cp6-fixture-final\\report.json": "84b5e0c18fd568312c44bee948ae5f1d83e3d9c4c22658a73bdc4f8ccf664b56",
+        "backend\\runtime\\cp6-fixture-final\\state.json": "52e548a9a0b158251d78893285e24b51a46e4592df9515f581662a18a619eb3c",
+        "backend\\runtime\\cp6-fixture-final\\desktop.png": "285806a4560b938c42a5901b01768c8b7df8d65fc982db1afeded98eebfc2f82",
+        "backend\\runtime\\cp6-fixture-final\\mobile.png": "c82f303febc0e904f34b8ced26d446aed0e8e8f6876232e633db141abdf80707"
+      }
+    },
+    {
+      "mode": "pt",
+      "result": "passed",
+      "synthetic_sources": false,
+      "model_calls": 1,
+      "provider": {
+        "requested_model": "deepseek",
+        "response_model": "deepseek-ai/DeepSeek-V4.1-Flash",
+        "temperature": 0,
+        "disable_thinking": true,
+        "max_output_tokens": 2048,
+        "finish_reason": "stop"
+      },
+      "initial_tools": [
+        "search",
+        "spec",
+        "quote"
+      ],
+      "draft_version": 3,
+      "confirmed_version": 2,
+      "checks_after_restart": 2,
+      "check_statuses": [
+        "insufficient_data"
+      ],
+      "notifications": 1,
+      "delivery_statuses": [
+        "delivered"
+      ],
+      "snapshot_unchanged": true,
+      "backend_restarted": true,
+      "browser_errors": [],
+      "mobile_overflow": false,
+      "last_quote": {
+        "instrument": {
+          "id": "2dd5eb6b-7a52-4186-a0ec-9f7f6ed6fbd7",
+          "ticker": "SiZ6",
+          "class_code": "SPBFUT",
+          "kind": "future",
+          "spec_source_id": "a7091aa9-f3de-4a65-86e4-51f711592ee9"
+        },
+        "data": {
+          "instruments": [
+            {
+              "values": [
+                {
+                  "type": "INSTRUMENT_VALUE_LAST_PRICE",
+                  "value": {
+                    "value": "81999"
+                  },
+                  "time": "2026-11-22T15:59:59.464801132Z"
+                }
+              ],
+              "ticker": "SiZ6",
+              "classCode": "SPBFUT",
+              "priceCurrency": "pt."
+            }
+          ]
+        }
+      },
+      "artifacts": {
+        "backend\\runtime\\cp6-live-pt-final\\report.json": "8336a82362ce1993e3a55491a4a1d887bff21658b7935df1b04970627e42068d",
+        "backend\\runtime\\cp6-live-pt-final\\state.json": "522f5604f34b3b3b0e2c154ba2addbb2e68b5996ad56655c5b8fe88939fb9b95",
+        "backend\\runtime\\cp6-live-pt-final\\desktop.png": "45fcb0dbd85be766cad8260824fa9b584769cdcbeeceff063199e8277b9de7ea",
+        "backend\\runtime\\cp6-live-pt-final\\mobile.png": "f659e5b5af78b0b829a5551a40ad2ba255c87d9fea8b0eabc720bdbeb132c88c"
+      }
+    }
+  ],
+  "limitations": [
+    "Live quote was stale: no fresh-market satisfied claim",
+    "No VPS/Docker runtime acceptance",
+    "In-app delivery only; no claim of human reading",
+    "One backend process, shared demo access",
+    "No trading operations"
+  ]
+}

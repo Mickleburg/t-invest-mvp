@@ -1,1 +1,1 @@
-{"name":"tradeguard-frontend","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"node dev-server.mjs","start":"node dev-server.mjs","check":"node --check dev-server.mjs && node --check src/app.js"},"engines":{"node":">=20"}}
+{"name":"tradeguard-frontend","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"node dev-server.mjs","start":"node dev-server.mjs","check":"node --check dev-server.mjs && node --check src/app.js && node --check src/cp6.js"},"engines":{"node":">=20"}}

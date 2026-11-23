@@ -1,4 +1,4 @@
-"""Proposed CP3 interface; implementation is not available yet."""
+"""CP6 interface, implemented by Monitor; checks refer to confirmed snapshots."""
 from typing import Protocol, Any
 
 class MonitoringService(Protocol):

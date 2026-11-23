@@ -18,6 +18,7 @@
           <span class="eyebrow">ПОДУМАТЬ ДО СДЕЛКИ</span>
           <h1>Что вы хотите отторговать?</h1>
           <p>Обсудим основания, возможные возражения и риск.</p>
+          <p id="dataMode" hidden></p>
           <details>
             <summary>История диалогов</summary>
             <select id="sessions" aria-label="Сохранённые диалоги"></select>
@@ -62,6 +63,11 @@
         </p>
       </section>
       <aside>
+        <section id="versionedPlan" aria-live="polite">
+          <h2>План и мониторинг</h2>
+          <p class="muted">Сохраните условия, проверьте риск и подтвердите конкретную версию плана.</p>
+          <button id="createPlan" type="button">Создать черновик</button>
+        </section>
         <section id="plan">
           <p class="eyebrow">РАБОЧАЯ ГИПОТЕЗА</p>
           <p class="muted">Промежуточные выводы появятся по мере разговора.</p>
@@ -76,6 +82,7 @@
         </details>
       </aside>
     </main>
+    <script src="/static/cp6.js"></script>
     <script src="/static/app.js"></script>
   </body>
 </html>

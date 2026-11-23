@@ -26,6 +26,7 @@ def check():
             else:
                 runtime=actual['paths'][path][verb]
                 assert {k:v for k,v in op.items() if k!='x-implementation-status'}==runtime
-    return {'openapi':'valid','plan_schema':'valid','examples':'valid','implemented_drift':False,'planned_routes_implemented':False}
+    return {'openapi':'valid','plan_schema':'valid','examples':'valid','implemented_drift':False,
+            'planned_operations':sum(op['x-implementation-status']=='planned' for item in spec['paths'].values() for op in item.values())}
 
 if __name__=='__main__':print(json.dumps(check()))

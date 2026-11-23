@@ -1,4 +1,4 @@
-"""Proposed CP3 interface; implementation is not available yet."""
+"""CP6 interface, implemented by Plans; wire contract remains provisional."""
 from typing import Protocol, Any
 
 class PlanRepository(Protocol):

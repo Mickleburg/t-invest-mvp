@@ -3,6 +3,7 @@ WORKDIR /app
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend /app/backend
+COPY contracts /app/contracts
 ENV LLM_PROVIDER=disabled TRADEGUARD_DATA=/data PYTHONDONTWRITEBYTECODE=1
 RUN useradd --create-home appuser && mkdir /data && chown appuser /data
 USER appuser

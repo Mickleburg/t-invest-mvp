@@ -60,6 +60,7 @@ function render(next) {
   if (next.session.id !== sid) return;
   state = next;
   controls();
+  refreshVersionedPlan(next);
   const signature = JSON.stringify(next);
   if (signature === lastSignature) return;
   const follow =
@@ -222,7 +223,7 @@ function render(next) {
     n.append(
       el(
         "strong",
-        `${toolTitle} · ${resultTitle}`,
+        `${toolTitle} · ${resultTitle}${e.synthetic ? ' · ТЕСТОВЫЕ ДАННЫЕ' : ''}`,
       ),
       el(
         "p",
@@ -360,6 +361,12 @@ document.querySelectorAll("#suggestions button").forEach(
 controls();
 (async () => {
   try {
+    const health = await api("/health");
+    automaticMonitoring = health.monitoring_enabled;
+    if (health.data_source.includes("TEST DOUBLE")) {
+      $("dataMode").textContent = "Учебный стенд: ответы и рыночные данные заменены тестовыми примерами.";
+      $("dataMode").hidden = false;
+    }
     const rows = await api("/sessions");
     const saved = localStorage.getItem("tradeguardSession");
     if (rows.some((s) => s.id === saved)) await open(saved);

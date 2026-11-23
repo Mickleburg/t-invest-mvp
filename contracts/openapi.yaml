@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
   title: TradeGuard MVP
-  version: 0.1.0
-  description: Implemented prototype subset + proposed CP2/CP3 operations. x-implementation-status
-    is normative; planned paths are not served.
+  version: 0.2.0
+  description: 'Implemented dialogue, versioned plans, confirmation and monitoring.
+    Provisional: human review required.'
 paths:
   /api/health:
     get:
@@ -118,351 +118,486 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
       x-implementation-status: implemented
     get:
-      operationId: message_history
-      summary: message_history
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
+      summary: Message History
+      operationId: message_history_api_sessions__sid__messages_get
       parameters:
       - name: sid
         in: path
         required: true
         schema:
           type: string
+          title: Sid
       responses:
         '200':
-          description: Target success
+          description: Successful Response
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/MessageRecord'
+                title: Response Message History Api Sessions  Sid  Messages Get
         '404':
-          description: Not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Not Found
         '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Conflict
         '422':
-          description: Incomplete/invalid plan or request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
         '503':
-          description: Source/provider unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
   /api/sessions/{sid}/plan:
     get:
-      operationId: session_draft
-      summary: session_draft
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
+      summary: Session Draft
+      operationId: session_draft_api_sessions__sid__plan_get
       parameters:
       - name: sid
         in: path
         required: true
         schema:
           type: string
+          title: Sid
       responses:
         '200':
-          description: Target success
+          description: Версия плана; ETag содержит SHA256 канонического черновика
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TradePlan'
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Quoted SHA256; use the 64 hex characters as content_hash
         '404':
-          description: Not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Not Found
         '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Conflict
         '422':
-          description: Incomplete/invalid plan or request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
         '503':
-          description: Source/provider unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
   /api/plans/{plan_id}:
     get:
-      operationId: get_plan
-      summary: get_plan
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
-      parameters: &id001
+      summary: Get Plan
+      operationId: get_plan_api_plans__plan_id__get
+      parameters:
       - name: plan_id
         in: path
         required: true
         schema:
           type: string
-          format: uuid
+          title: Plan Id
       responses:
         '200':
-          description: Target success
+          description: Версия плана; ETag содержит SHA256 канонического черновика
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TradePlan'
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Quoted SHA256; use the 64 hex characters as content_hash
         '404':
-          description: Not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Not Found
         '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Conflict
         '422':
-          description: Incomplete/invalid plan or request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
         '503':
-          description: Source/provider unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
     patch:
-      operationId: update_draft
-      summary: update_draft
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
-      parameters: *id001
-      responses:
-        '200':
-          description: Target success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradePlan'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '422':
-          description: Incomplete/invalid plan or request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '503':
-          description: Source/provider unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      summary: Update Draft
+      operationId: update_draft_api_plans__plan_id__patch
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PlanPatch'
-  /api/plans/{plan_id}/confirm:
-    post:
-      operationId: confirm_version
-      summary: confirm_version
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
-      parameters: *id001
       responses:
         '200':
-          description: Target success
+          description: Версия плана; ETag содержит SHA256 канонического черновика
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TradePlan'
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Quoted SHA256; use the 64 hex characters as content_hash
         '404':
-          description: Not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Not Found
         '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Conflict
         '422':
-          description: Incomplete/invalid plan or request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
         '503':
-          description: Source/provider unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
+  /api/plans/{plan_id}/confirm:
+    post:
+      summary: Confirm Version
+      operationId: confirm_version_api_plans__plan_id__confirm_post
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PlanConfirmation'
-  /api/plans/{plan_id}/monitoring:
-    get:
-      operationId: monitoring_state
-      summary: monitoring_state
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
-      parameters: *id001
       responses:
         '200':
-          description: Target success
+          description: Версия плана; ETag содержит SHA256 канонического черновика
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradePlan'
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Quoted SHA256; use the 64 hex characters as content_hash
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Conflict
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
+  /api/plans/{plan_id}/monitoring:
+    get:
+      summary: Monitoring State
+      operationId: monitoring_state_api_plans__plan_id__monitoring_get
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      responses:
+        '200':
+          description: Successful Response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MonitoringState'
         '404':
-          description: Not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Not Found
         '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Conflict
         '422':
-          description: Incomplete/invalid plan or request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
         '503':
-          description: Source/provider unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/plans/{plan_id}/notifications:
-    get:
-      operationId: notifications
-      summary: notifications
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
-      parameters: *id001
-      responses:
-        '200':
-          description: Target success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Notification'
-        '404':
-          description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '422':
-          description: Incomplete/invalid plan or request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '503':
-          description: Source/provider unavailable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
   /api/plans/{plan_id}/checks:
     get:
-      operationId: checks
-      summary: checks
-      description: PLANNED, not implemented. Calling this route today returns 404;
-        responses below are the target contract.
-      x-implementation-status: planned
-      parameters: *id001
+      summary: Checks
+      operationId: checks_api_plans__plan_id__checks_get
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
       responses:
         '200':
-          description: Target success
+          description: Successful Response
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Check'
+                title: Response Checks Api Plans  Plan Id  Checks Get
         '404':
-          description: Not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Not Found
         '409':
-          description: Stale version/hash, already confirmed or idempotency conflict
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Conflict
         '422':
-          description: Incomplete/invalid plan or request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
         '503':
-          description: Source/provider unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
+  /api/plans/{plan_id}/notifications:
+    get:
+      summary: Notifications
+      operationId: notifications_api_plans__plan_id__notifications_get
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+                title: Response Notifications Api Plans  Plan Id  Notifications Get
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Conflict
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
+  /api/plans/{plan_id}/notifications/{notification_id}/ack:
+    post:
+      summary: Acknowledge Notification
+      operationId: acknowledge_notification_api_plans__plan_id__notifications__notification_id__ack_post
+      parameters:
+      - name: plan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Plan Id
+      - name: notification_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Notification Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Conflict
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unprocessable Content
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Service Unavailable
+      x-implementation-status: implemented
 components:
   schemas:
+    Check:
+      properties:
+        id:
+          type: string
+          title: Id
+        plan_id:
+          type: string
+          title: Plan Id
+        plan_version:
+          type: integer
+          title: Plan Version
+        rule_id:
+          type: string
+          title: Rule Id
+        checked_at:
+          type: string
+          title: Checked At
+        status:
+          type: string
+          enum:
+          - satisfied
+          - affected
+          - insufficient_data
+          - error
+          title: Status
+        source_ids:
+          items:
+            type: string
+          type: array
+          title: Source Ids
+        observed_value:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Observed Value
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - plan_id
+      - plan_version
+      - rule_id
+      - checked_at
+      - status
+      - source_ids
+      - observed_value
+      title: Check
     Error:
       properties:
         detail:
@@ -502,6 +637,10 @@ components:
           type: boolean
           title: Llm Configured
           default: true
+        monitoring_enabled:
+          type: boolean
+          title: Monitoring Enabled
+          default: false
       additionalProperties: false
       type: object
       required:
@@ -566,6 +705,114 @@ components:
       - created_at
       - response
       title: MessageRecord
+    MonitoringState:
+      properties:
+        plan_id:
+          type: string
+          title: Plan Id
+        confirmed_version:
+          type: integer
+          title: Confirmed Version
+        state:
+          type: string
+          enum:
+          - not_started
+          - active
+          - paused
+          - error
+          title: State
+        last_checked_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Checked At
+        next_check_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Check At
+      additionalProperties: false
+      type: object
+      required:
+      - plan_id
+      - confirmed_version
+      - state
+      - last_checked_at
+      - next_check_at
+      title: MonitoringState
+    Notification:
+      properties:
+        id:
+          type: string
+          title: Id
+        plan_id:
+          type: string
+          title: Plan Id
+        plan_version:
+          type: integer
+          title: Plan Version
+        check_id:
+          type: string
+          title: Check Id
+        created_at:
+          type: string
+          title: Created At
+        text:
+          type: string
+          title: Text
+        delivery_status:
+          type: string
+          enum:
+          - stored
+          - delivered
+          - failed
+          title: Delivery Status
+      additionalProperties: false
+      type: object
+      required:
+      - id
+      - plan_id
+      - plan_version
+      - check_id
+      - created_at
+      - text
+      - delivery_status
+      title: Notification
+    PlanConfirmation:
+      properties:
+        version:
+          type: integer
+          minimum: 1.0
+          title: Version
+        content_hash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          title: Content Hash
+        request_id:
+          type: string
+          format: uuid
+          title: Request Id
+      additionalProperties: false
+      type: object
+      required:
+      - version
+      - content_hash
+      - request_id
+      title: PlanConfirmation
+    PlanPatch:
+      properties:
+        expected_version:
+          type: integer
+          minimum: 1.0
+          title: Expected Version
+        changes:
+          $ref: '#/components/schemas/PlanChanges'
+      additionalProperties: false
+      type: object
+      required:
+      - expected_version
+      - changes
+      title: PlanPatch
     Session:
       properties:
         id:
@@ -655,53 +902,53 @@ components:
           - draft
           - confirmed
           - archived
-        educational: &id002
+        educational:
           type: boolean
-        session_id: &id003
+        session_id:
           type: string
-        instrument: &id004
+        instrument:
           $ref: '#/components/schemas/Plan_Instrument'
-        direction: &id005
+        direction:
           enum:
           - long
           - short
-        hypothesis: &id006
+        hypothesis:
           type: string
-        basis: &id007
+        basis:
           type: array
           items:
             type: string
-        counterarguments: &id008
+        counterarguments:
           type: array
           items:
             type: string
-        horizon: &id009
+        horizon:
           type: string
-        entry_conditions: &id010
+        entry_conditions:
           type: array
           items:
             type: string
-        exit_conditions: &id011
+        exit_conditions:
           type: array
           items:
             type: string
-        review_conditions: &id012
+        review_conditions:
           type: array
           items:
             type: string
-        parameters: &id013
+        parameters:
           $ref: '#/components/schemas/Plan_Parameters'
-        risk: &id014
+        risk:
           $ref: '#/components/schemas/Plan_Risk'
-        rules: &id015
+        rules:
           type: array
           items:
             $ref: '#/components/schemas/Plan_Rule'
-        sources: &id016
+        sources:
           type: array
           items:
             $ref: '#/components/schemas/Plan_Source'
-        missing: &id017
+        missing:
           type: array
           items:
             type: string
@@ -1039,149 +1286,54 @@ components:
       additionalProperties: false
       minProperties: 1
       properties:
-        educational: *id002
-        session_id: *id003
-        instrument: *id004
-        direction: *id005
-        hypothesis: *id006
-        basis: *id007
-        counterarguments: *id008
-        horizon: *id009
-        entry_conditions: *id010
-        exit_conditions: *id011
-        review_conditions: *id012
-        parameters: *id013
-        risk: *id014
-        rules: *id015
-        sources: *id016
-        missing: *id017
-    PlanPatch:
-      type: object
-      additionalProperties: false
-      required:
-      - expected_version
-      - changes
-      properties:
-        expected_version:
-          type: integer
-          minimum: 1
-        changes:
-          $ref: '#/components/schemas/PlanChanges'
-    PlanConfirmation:
-      type: object
-      additionalProperties: false
-      required:
-      - version
-      - content_hash
-      - request_id
-      properties:
-        version:
-          type: integer
-          minimum: 1
-        content_hash:
+        educational:
+          type: boolean
+        session_id:
           type: string
-          pattern: ^[a-f0-9]{64}$
-        request_id:
-          type: string
-          format: uuid
-    MonitoringState:
-      type: object
-      additionalProperties: false
-      required:
-      - plan_id
-      - confirmed_version
-      - state
-      - last_checked_at
-      - next_check_at
-      properties:
-        plan_id:
-          type: string
-          format: uuid
-        confirmed_version:
-          type: integer
-          minimum: 1
-        state:
+        instrument:
+          $ref: '#/components/schemas/Plan_Instrument'
+        direction:
           enum:
-          - not_started
-          - active
-          - paused
-          - error
-        last_checked_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        next_check_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-    Check:
-      type: object
-      additionalProperties: false
-      required:
-      - id
-      - plan_id
-      - plan_version
-      - rule_id
-      - checked_at
-      - status
-      - source_ids
-      - observed_value
-      properties:
-        id:
+          - long
+          - short
+        hypothesis:
           type: string
-        plan_id:
-          type: string
-        plan_version:
-          type: integer
-        rule_id:
-          type: string
-        checked_at:
-          type: string
-          format: date-time
-        status:
-          enum:
-          - satisfied
-          - affected
-          - insufficient_data
-          - error
-        source_ids:
+        basis:
           type: array
           items:
             type: string
-        observed_value:
-          type:
-          - string
-          - 'null'
-    Notification:
-      type: object
-      additionalProperties: false
-      required:
-      - id
-      - plan_id
-      - plan_version
-      - check_id
-      - created_at
-      - text
-      - delivery_status
-      properties:
-        id:
+        counterarguments:
+          type: array
+          items:
+            type: string
+        horizon:
           type: string
-        plan_id:
-          type: string
-        plan_version:
-          type: integer
-        check_id:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-        text:
-          type: string
-        delivery_status:
-          enum:
-          - stored
-          - delivered
-          - failed
+        entry_conditions:
+          type: array
+          items:
+            type: string
+        exit_conditions:
+          type: array
+          items:
+            type: string
+        review_conditions:
+          type: array
+          items:
+            type: string
+        parameters:
+          $ref: '#/components/schemas/Plan_Parameters'
+        risk:
+          $ref: '#/components/schemas/Plan_Risk'
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan_Rule'
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan_Source'
+        missing:
+          type: array
+          items:
+            type: string
 x-contract-state: provisional-team-review-required

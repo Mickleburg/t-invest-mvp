@@ -76,7 +76,18 @@ VPS overlay: `docker compose --env-file infra/.env -f infra/compose.yaml -f infr
 
 Overlay принудительно выбирает публичный DeepSeek и читает отдельный DEEPSEEK_API_KEY; корпоративный LLM_API_KEY не переносить на VPS. Исходящие зависимости: DeepSeek HTTPS, T-Invest sandbox MCP HTTPS/streamable HTTP, Research сайты и ACME. На VPS повторить диагностику, live сценарий, HTTPS/auth, restart/volume persistence и restore drill. Результат с ноутбука не заменяет VPS проверку.
 
-Отдельный monitoring worker пока отсутствует: его можно подключать только после confirmed repository/версий и тестов snapshot, дедупликации, перезапуска. Не запускать фиктивный worker, проверяющий draft.
+CP6: worker встроен в lifespan единственного backend, без отдельного сервиса. TRADEGUARD_MONITORING_ENABLED=1 по умолчанию; TRADEGUARD_MONITORING_INTERVAL_SECONDS=60 (10–3600). Он читает confirmed snapshot и выполняет только read-only spec/quote. До подтверждения сетевых проверок нет. Health.monitoring_enabled отражает запуск worker, не доступность MCP. Отключение worker сохраняет подтверждение и историю; UI сообщает об отключении.
+
+Изолированный браузерный CP6 smoke (собственные временные SQLite/процессы, штатный restart и cleanup):
+
+```powershell
+# Offline: источники и модель явно заменены учебными fixtures.
+backend/.venv/Scripts/python -m backend.scripts.smoke_cp6 --mode fixture --output backend/runtime/cp6-fixture
+# Отдельный сетевой прогон: настоящий PT deepseek и sandbox MCP.
+backend/.venv/Scripts/python -m backend.scripts.smoke_cp6 --mode pt --windows-user-key --zero-cost-pt --output backend/runtime/cp6-live-pt
+```
+
+Вторая команда применима к подтверждённому пользователем нулевому тарифу PT. Ключ читается в память, не передаётся Node/frontend. Smoke допускает до двух обращений модели; в проверенном сценарии использовано одно. Порты 18103/15174 можно переопределить. Артефакты — JSON и desktop/mobile screenshots, без копий БД. Политика подтверждения, возраст данных и ограничения — CP6_EVALUATION.md.
 
 ## Диагностика и восстановление
 

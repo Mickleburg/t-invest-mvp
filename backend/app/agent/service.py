@@ -61,6 +61,8 @@ class Service:
                             return
                     attempted.add(key);calls+=1
                     e=await self.tool(request,known)
+                    e['synthetic']=bool(e.get('synthetic') or self.test_doubles)
+                    e['instrument_id']=request.instrument_id
                     evidence.append(e)
                     turn_evidence.append(e)
                     with self.store.connect() as db:db.execute('INSERT INTO evidence VALUES(?,?,?,?)',(e['id'],sid,request_id,dump(e)))

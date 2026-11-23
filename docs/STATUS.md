@@ -1,4 +1,6 @@
-# Состояние на 22 ноября 2026
+# Состояние на 23 ноября 2026
+
+Актуальный этап: CP6 реализован и проверен; детали — CP6_EVALUATION.md и CP6_RESULTS.json. Ниже сохранена история предыдущих этапов, включая прежние ограничения, устранённые позднее.
 
 Ветка `work/integration-foundation`, исходный HEAD `5cf2510`, исходная main чистая. На этапе подготовки коммиты/push не выполнялись; новое поручение пользователя о коммитах записано в AGENTS.md. Существующая структура и публичные контракты сохранены; согласование контрактов командой не объявлено.
 
@@ -69,3 +71,13 @@ MCP timeout воспроизведён только на proxy/SSE route; нап
 95 offline test passed, check_contracts valid/no drift, frontend check и обе Compose config прошли. Артефакты и границы — CP5_EVALUATION.md, машинная сводка — CP5_RESULTS.json. Технические критерии CP5 выполнены для указанного набора; командное закрытие/утверждение не объявлено. CP6/CP7 не реализованы. Новые одноразовые smoke backend штатно остановились и удалили свои временные БД; старые TEMP-каталоги предыдущего этапа не трогались.
 
 Затронутые файлы CP5: agent/prompt.py, service.py и новые workflow.py/presentation.py/grounding.py; llm/external.py; integrations/tools.py; новый tests/test_cp5.py и test_external_llm.py; новые scripts/compare_providers.py/evaluate_cp5.py, обновлённые check_live_slice.py/smoke_vertical_slice.py и диагностические probe_integrations.py/smoke_pt_llm.py; infra/compose.yaml и .env.example; README и связанные docs, включая новые CP5_EVALUATION.md и CP5_RESULTS.json. Frontend/src, публичные contracts, Risk Engine и рабочие БД не менялись. Все одноразовые backend завершились штатно; отдельный тестовый frontend остановлен.
+
+## CP6: подтверждённый план и уведомления — 23 ноября
+
+Реализованы отдельный TradePlan, CAS правок, ETag/hash подтверждения, транзакционный immutable snapshot и идемпотентность. Новый черновик не меняет подтверждённые условия. risk/plan.py использует существующий Decimal engine; клиентские расчёты и источники не принимаются на доверии. Worker встроен в единственный backend, читает только snapshot, заново проверяет spec/quote, сохраняет происхождение и timestamps. Уведомления переживают restart и дедуплицируются; delivered появляется после ACK браузера.
+
+Редактор, подтверждение версии и уведомления добавлены в frontend/src/cp6.js. OpenAPI v0.2 отражает реализованные операции и ACK/ETag/monitoring_enabled, TradePlan schema v0.1 сохранена. Контракты provisional: человеческое утверждение не объявлено. Новые коммиты и описания на русском, author/committer пользователя; push не поручен.
+
+Итоговые проверки: 136 offline tests passed (41 CP6), check_contracts valid/no drift/0 planned, frontend check и обе Compose config проходят. В отдельных browser smoke прошли fixture и живой PT deepseek + sandbox MCP: подтверждение v2, новый draft v3, реальный штатный restart на том же временном хранилище, неизменность snapshot и отсутствие повторного уведомления. В live использован один вызов DeepSeek-V4.1-Flash. Старая котировка дала insufficient_data, без ложного срабатывания; satisfied проверен на явно синтетических данных. Desktop/mobile без JS ошибок и overflow. Одноразовые процессы остановлены, новые временные БД штатно очищены; рабочие БД не копировались.
+
+Файлы и доказательства: CP6_EVALUATION.md и CP6_RESULTS.json; основные изменения — plans/, monitoring/, risk/plan.py, api/, storage/repository.py, tests/test_cp6.py, scripts/cp6_fixtures.py и smoke_cp6.py, frontend/src/, contracts/openapi.yaml, Dockerfile/Compose и актуальные инструкции. Следующий этап CP7: Docker/VPS, публичный ключ, HTTPS и backup/restore; пока не выполнен. Команде нужны ревью API/подтверждения/ACK, трактовки affected и порогов свежести. CP6 готов к техническому ревью, командное закрытие не объявляется.
