@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Торговый терминал TradeGuard">
+  <title>TradeGuard · Торговый терминал</title>
+  <link rel="stylesheet" href="terminal.css">
+  <script src="terminal.js" defer></script>
+  <script src="terminal-chat.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <ul class="market-strip" aria-label="Демонстрационные котировки">
+      <li><b>T</b> 280,32 ₽ <strong class="up">+0,58%</strong></li>
+      <li><b>IMOEX</b> 2 372,97 <strong class="up">+0,91%</strong></li>
+      <li><b>RTSI</b> 909,98 <strong class="up">+0,96%</strong></li>
+      <li><b>SPX</b> 7 243,57 <strong class="up">+4,82%</strong></li>
+      <li><b>NDX</b> 26 752,00 <strong class="up">+6,88%</strong></li>
+      <li><b>BTC</b> 61 128,01 $ <strong class="down">−0,05%</strong></li>
+      <li><b>ETH</b> 1 724,02 $ <strong class="down">−0,01%</strong></li>
+      <li><b>Brent</b> 89,18 $ <strong class="down">−2,90%</strong></li>
+      <li><b>Золото</b> 3 632,27 $ <strong class="up">+1,37%</strong></li>
+    </ul>
+    <div class="toolbar">
+      <h1 class="wordmark"><span class="brand-mark" aria-hidden="true"></span>TradeGuard</h1>
+      <div class="account-summary">
+        <span class="account-name">Брокерский счёт</span>
+        <span class="account-value"><strong>965,08 ₽</strong><span class="down">−30,43 ₽ <span class="account-percent">(−3,06%)</span></span></span>
+      </div>
+      <div class="toolbar-actions">
+        <button id="show-windows" type="button" popovertarget="window-picker">Окна</button>
+        <div class="window-picker" id="window-picker" popover="auto" role="group" aria-label="Видимые окна"></div>
+        <button class="reset-layout" id="reset-layout" type="button" aria-label="Сбросить раскладку" title="Сбросить раскладку">
+          <span aria-hidden="true">↺</span><span class="reset-label">Сбросить раскладку</span>
+        </button>
+        <button class="widget-toggle" id="toggle-widget" type="button"
+          aria-controls="tradeguard-window" aria-expanded="true">
+          <span aria-hidden="true">◫</span> Помощник
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="workbench">
+    <p id="move-window-hint" hidden>Перетащите заголовок или используйте клавиши со стрелками.</p>
+    <div class="terminal">
+      <section class="panel watchlist" aria-labelledby="watchlist-title">
+        <div class="panel-heading drag-handle" tabindex="0" aria-describedby="move-window-hint">
+          <h2 id="watchlist-title">Инструменты</h2>
+          <span class="panel-meta">MOEX</span>
+          <button class="window-close" type="button" title="Закрыть окно" aria-label="Закрыть окно «Инструменты»">×</button>
+        </div>
+        <div class="instrument-search">
+          <input type="search" id="ticker-search" placeholder="Поиск по тикеру" aria-label="Поиск по тикеру">
+        </div>
+        <div class="table-scroll">
+          <table class="market-table">
+            <thead><tr><th scope="col">Тикер</th><th scope="col" title="Оборот, млрд ₽">Млрд ₽</th><th scope="col">Цена, ₽</th><th scope="col">1Д</th></tr></thead>
+            <tbody id="market-rows"></tbody>
+          </table>
+          <p class="search-empty" id="ticker-empty" hidden>Тикер не найден</p>
+        </div>
+      </section>
+
+      <section class="panel chart" aria-labelledby="chart-title">
+        <div class="panel-heading drag-handle" tabindex="0" aria-describedby="move-window-hint">
+          <h2 id="chart-title">График</h2>
+          <span class="panel-meta">SBER · MOEX</span>
+          <button class="window-close" type="button" title="Закрыть окно" aria-label="Закрыть окно «График»">×</button>
+        </div>
+        <div class="chart-summary">
+          <div><span>Сбербанк</span><strong>289,66 ₽</strong></div>
+          <span class="up">+1,47 ₽ (+0,51%)</span>
+        </div>
+        <div class="chart-tools">
+          <div id="chart-periods" role="group" aria-label="Период графика">
+            <button type="button" data-period="month" aria-pressed="false">1М</button>
+            <button type="button" data-period="halfyear" aria-pressed="false">6М</button>
+            <button type="button" data-period="all" aria-pressed="true">Всё</button>
+          </div>
+          <span>Цена, ₽</span>
+        </div>
+        <div class="chart-drawing">
+          <canvas id="price-chart" role="img" aria-label="Свечной график Сбера с объёмом торгов"></canvas>
+        </div>
+        <div class="chart-axis" aria-hidden="true"><span>Янв ’25</span><span>Июн</span><span>Янв ’26</span><span>Июн</span><span>Ноя</span></div>
+      </section>
+
+      <section class="panel holdings" aria-labelledby="holdings-title">
+        <div class="panel-heading drag-handle" tabindex="0" aria-describedby="move-window-hint">
+          <h2 id="holdings-title">Портфель</h2>
+          <span class="panel-meta">RUB</span>
+          <button class="window-close" type="button" title="Закрыть окно" aria-label="Закрыть окно «Портфель»">×</button>
+        </div>
+        <dl class="metrics">
+          <div><dt>Баланс</dt><dd>965,08 ₽</dd></div>
+          <div><dt>За всё время</dt><dd class="down">−30,43 ₽</dd></div>
+          <div><dt>За сегодня</dt><dd class="up">+6,48 ₽</dd></div>
+        </dl>
+        <div class="table-scroll">
+          <table class="positions-table">
+            <thead><tr><th scope="col">Актив</th><th scope="col">Кол-во</th><th scope="col">Цена, ₽</th><th scope="col">Средняя, ₽</th><th scope="col">Доля</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Рубли</th><td>96,10</td><td>—</td><td>—</td><td>9,96%</td></tr>
+              <tr><th scope="row">SBER</th><td>3</td><td>289,66</td><td>299,80</td><td>90,04%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel order-preview" aria-labelledby="order-preview-title">
+        <div class="panel-heading drag-handle" tabindex="0" aria-describedby="move-window-hint">
+          <h2 id="order-preview-title">Заявка</h2>
+          <span class="panel-meta">SBER</span>
+          <button class="window-close" type="button" title="Закрыть окно" aria-label="Закрыть окно «Заявка»">×</button>
+        </div>
+        <div class="order-preview-body">
+          <div class="order-asset"><b>Сбербанк</b><strong>289,66 ₽</strong><span class="up">+0,51%</span></div>
+          <dl class="order-parameters">
+            <div><dt>Тип</dt><dd>Лимитная</dd></div>
+            <div><dt>Цена</dt><dd>299,80 ₽</dd></div>
+            <div><dt>Количество</dt><dd>3 лота</dd></div>
+          </dl>
+          <div class="order-actions">
+            <button type="button" data-side="Покупка">Купить</button>
+            <button type="button" data-side="Продажа">Продать</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel orders" aria-labelledby="orders-title">
+        <div class="panel-heading drag-handle" tabindex="0" aria-describedby="move-window-hint">
+          <h2 id="orders-title">Заявки</h2>
+          <span class="panel-meta">Активные</span>
+          <button class="window-close" type="button" title="Закрыть окно" aria-label="Закрыть окно «Заявки»">×</button>
+        </div>
+        <div class="empty"><p>Нет активных заявок</p></div>
+      </section>
+
+      <section class="panel depth" aria-labelledby="depth-title">
+        <div class="panel-heading drag-handle" tabindex="0" aria-describedby="move-window-hint">
+          <h2 id="depth-title">Стакан</h2>
+          <span class="panel-meta">SBER</span>
+          <button class="window-close" type="button" title="Закрыть окно" aria-label="Закрыть окно «Стакан»">×</button>
+        </div>
+        <div class="depth-drawing">
+          <strong>289,66 ₽</strong>
+          <canvas id="depth-chart" role="img" aria-label="Иллюстрация глубины стакана"></canvas>
+        </div>
+        <div class="depth-sides"><span class="up">Покупка, ₽</span><span class="down">Продажа, ₽</span></div>
+        <div class="empty"><p>Нет заявок<br>для отображения</p></div>
+      </section>
+    </div>
+
+    <div class="widget-dock" aria-hidden="true"></div>
+    <section class="widget" id="tradeguard-window" aria-labelledby="widget-title">
+      <div class="widget-bar drag-handle" id="widget-bar" tabindex="0" aria-describedby="move-window-hint">
+        <h2 id="widget-title">TradeGuard</h2>
+        <div class="window-controls">
+          <button id="minimize-widget" type="button" aria-controls="widget-content" title="Свернуть окно" aria-label="Свернуть окно">−</button>
+          <button id="maximize-widget" type="button" title="Развернуть окно" aria-label="Развернуть окно">□</button>
+          <button class="window-close" id="close-widget" type="button" title="Закрыть окно" aria-label="Закрыть окно «TradeGuard»">×</button>
+        </div>
+      </div>
+
+      <div class="widget-content" id="widget-content" data-view="chat">
+        <div class="widget-tabs" role="group" aria-label="Разделы окна TradeGuard">
+          <button type="button" data-view="order" aria-pressed="false" aria-controls="widget-order">Заявка</button>
+          <button type="button" data-view="chat" aria-pressed="true" aria-controls="widget-chat">Помощник</button>
+        </div>
+
+        <section class="widget-order" id="widget-order" aria-labelledby="widget-order-title">
+          <div class="widget-section-heading"><h3 id="widget-order-title">Заявка</h3></div>
+          <div class="widget-order-scroll">
+            <form id="practice-order">
+              <label>Инструмент
+                <select id="practice-symbol">
+                  <option value="SBER">SBER · Сбер</option>
+                  <option value="SiZ6">SiZ6 · фьючерс USD/RUB</option>
+                </select>
+              </label>
+              <div class="quote"><strong id="practice-price">289,66 ₽</strong><span id="practice-lot">Лот: 10 акций</span></div>
+              <div class="form-pair">
+                <label>Действие
+                  <select id="practice-side"><option>Покупка</option><option>Продажа</option></select>
+                </label>
+                <label>Количество лотов
+                  <input id="practice-quantity" type="number" min="1" step="1" value="1" required>
+                </label>
+              </div>
+              <label>Стоп-цена
+                <input type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Введите цену">
+              </label>
+              <button class="practice-submit" id="practice-submit" type="submit">Купить</button>
+              <p class="form-status" id="practice-status" role="status" hidden></p>
+            </form>
+            <section class="widget-portfolio" aria-labelledby="widget-portfolio-title">
+              <h4 id="widget-portfolio-title">Портфель</h4>
+              <strong class="portfolio-total">965,08 ₽</strong>
+              <dl class="metrics">
+                <div><dt>Деньги</dt><dd>96,10 ₽</dd></div>
+                <div><dt>Результат</dt><dd class="down">−30,43 ₽</dd></div>
+              </dl>
+              <div class="portfolio-position"><b>SBER</b><span>868,98 ₽</span><small>3 акции</small></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="widget-chat" id="widget-chat" aria-labelledby="widget-chat-title">
+          <div class="widget-section-heading">
+            <h3 id="widget-chat-title">Помощник</h3>
+            <button class="secondary-button" id="new-dialog" type="button" disabled>Новый диалог</button>
+          </div>
+          <details class="dialog-history">
+            <summary>История диалогов</summary>
+            <select id="dialog-sessions" aria-label="Сохранённые диалоги" disabled>
+              <option value="">Нет диалогов</option>
+            </select>
+          </details>
+          <div class="messages" id="dialog-messages" role="log" aria-label="Сообщения диалога" tabindex="0"></div>
+          <form class="composer" id="dialog-form">
+            <textarea id="dialog-input" rows="2" maxlength="5000" placeholder="Напишите, что хотите понять…" aria-label="Сообщение помощнику" required disabled></textarea>
+            <button id="dialog-send" type="submit" disabled>Отправить</button>
+          </form>
+          <p class="chat-status" id="dialog-status" role="status">Подключение к агенту…</p>
+        </section>
+      </div>
+
+      <button class="resize-grip" id="resize-widget" type="button"
+        title="Изменить размер за край или угол окна" aria-label="Изменить размер окна клавишами со стрелками"></button>
+    </section>
+  </main>
+
+  <footer class="status-bar"><span>Демо-данные</span></footer>
+</body>
+</html>
